@@ -62,6 +62,7 @@
     <Compile Include="RenderMode.cs" />
     <Compile Include="ResourceDictionaryGenerator.cs" />
     <Compile Include="Types\CustomUserControlGeneratorType.cs" />
+    <Compile Include="Types\NumericTextBoxGeneratorType.cs" />
     <Compile Include="Types\SliderGeneratorType.cs" />
     <Compile Include="Types\ThumbGeneratorType.cs" />
     <Compile Include="Types\TrackGeneratorType.cs" />

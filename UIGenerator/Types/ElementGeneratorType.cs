@@ -97,6 +97,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateEnumField<HorizontalAlignment>(method, fieldReference, source, FrameworkElement.HorizontalAlignmentProperty);
             CodeComHelper.GenerateEnumField<VerticalAlignment>(method, fieldReference, source, FrameworkElement.VerticalAlignmentProperty);
             CodeComHelper.GenerateTemplateStyleField(classType, method, fieldReference, source, FrameworkElement.StyleProperty);
+            CodeComHelper.GenerateToolTipField(classType, method, fieldReference, source, FrameworkElement.ToolTipProperty);
 
             return fieldReference;
         }

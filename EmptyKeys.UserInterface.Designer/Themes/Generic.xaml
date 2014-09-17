@@ -15,4 +15,8 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <Style TargetType="{x:Type local:NumericTextBox}" BasedOn="{StaticResource {x:Type TextBox}}">
+        <Setter Property="TextAlignment" Value="Right" />
+    </Style>
 </ResourceDictionary>

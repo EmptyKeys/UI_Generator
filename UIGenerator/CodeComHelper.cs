@@ -10,6 +10,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
@@ -43,6 +44,9 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("HorizontalScrollBarVisibility");
             supportedAttachedProperties.Add("VerticalScrollBarVisibility");
             supportedAttachedProperties.Add("Sounds");
+            supportedAttachedProperties.Add("Placement");
+            supportedAttachedProperties.Add("ShowDuration");
+            supportedAttachedProperties.Add("InitialShowDelay");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");
@@ -130,6 +134,74 @@ namespace EmptyKeys.UserInterface.Generator
                     new CodePrimitiveExpression((float)length.Value),
                     new CodeFieldReferenceExpression(new CodeTypeReferenceExpression("GridUnitType"), length.GridUnitType.ToString()));
                 method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(target, property.Name), lengthExpr));
+            }
+        }
+
+        /// <summary>
+        /// Generates the tool tip field.
+        /// </summary>
+        /// <param name="parentClass">The parent class.</param>
+        /// <param name="method">The method.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="property">The property.</param>
+        public static void GenerateToolTipField(CodeTypeDeclaration parentClass, CodeMemberMethod method, CodeExpression target, DependencyObject source, DependencyProperty property)
+        {
+            if (IsValidForFieldGenerator(source.ReadLocalValue(property)))
+            {
+                object toolTipValue = source.GetValue(property);
+                ToolTip toolTip = toolTipValue as ToolTip;
+                object content = toolTipValue;
+                if (toolTip != null)
+                {
+                    content = toolTip.Content;
+                }
+
+                FrameworkElement elem = source as FrameworkElement;
+                string variableName = "tt_" + elem.Name;
+                CodeVariableDeclarationStatement variable = new CodeVariableDeclarationStatement(
+                    "ToolTip", variableName, new CodeObjectCreateExpression("ToolTip"));
+                method.Statements.Add(variable);
+                var variableExpr = new CodeVariableReferenceExpression(variableName);
+                method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(target, property.Name), variableExpr));
+
+                if (toolTip != null)
+                {
+                    CodeComHelper.GenerateEnumField<PlacementMode>(method, variableExpr, toolTip, ToolTip.PlacementProperty);
+                }
+
+                CodeExpression contentExpr = null;
+                Type contentType = content.GetType();
+                if (contentType.IsPrimitive || content is string)
+                {
+                    contentExpr = new CodePrimitiveExpression(content);
+                }
+                else if (contentType.IsSubclassOf(typeof(FrameworkElement)))
+                {
+                    CodeMemberMethod initTemplateMethod = new CodeMemberMethod();
+                    initTemplateMethod.ReturnType = new CodeTypeReference("UIElement");
+                    initTemplateMethod.Name = variableName + "_Method";
+                    
+                    TypeGenerator generator = new TypeGenerator();
+                    contentExpr = generator.ProcessGenerators(content, parentClass, initTemplateMethod, false);
+
+                    if (initTemplateMethod.Statements.Count < 1)
+                    {
+                        contentExpr = new CodePrimitiveExpression(string.Empty);
+                    }
+                    else
+                    {
+                        CodeVariableDeclarationStatement firstStatement = initTemplateMethod.Statements[1] as CodeVariableDeclarationStatement;
+                        CodeMethodReturnStatement returnInitTemplateMethod = new CodeMethodReturnStatement(new CodeVariableReferenceExpression(firstStatement.Name));
+                        initTemplateMethod.Statements.Add(returnInitTemplateMethod);
+                        parentClass.Members.Add(initTemplateMethod);
+
+                        contentExpr = new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), initTemplateMethod.Name);
+                    }
+                }
+
+                method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(variableExpr, "Content"), contentExpr));
+
             }
         }
 

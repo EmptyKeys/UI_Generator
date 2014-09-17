@@ -133,6 +133,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType slider = new SliderGeneratorType();
             Generators.Add(slider.XamlType, slider);
+
+            IGeneratorType numeric = new NumericTextBoxGeneratorType();
+            Generators.Add(numeric.XamlType, numeric);
         }
 
         /// <summary>
