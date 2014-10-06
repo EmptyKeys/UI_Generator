@@ -1,6 +1,7 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
+using System.Globalization;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -94,7 +95,7 @@ namespace EmptyKeys.UserInterface.Generator
                 string fontStyle = GetFontStyle(info);
 
                 string assetName = GetFontAssetName(fontName, fontSize, fontStyle);
-                string fileContent = string.Format(template, fontName, fontSize, fontStyle);
+                string fileContent = string.Format(template, fontName, fontSize.ToString(CultureInfo.InvariantCulture), fontStyle);
                 string fullPath = Path.Combine(path, assetName) + ".spritefont";
 
                 using (StreamWriter outfile = new StreamWriter(fullPath, false, Encoding.UTF8))
@@ -118,7 +119,7 @@ namespace EmptyKeys.UserInterface.Generator
 
         private static string GetFontAssetName(string fontName, float fontSize, string fontStyle)
         {
-            return fontName.Replace(" ", "_") + "_" + fontSize + "_" + fontStyle.Replace(" ", "_").Replace(",", "_");
+            return fontName.Replace(" ", "_") + "_" + fontSize.ToString(CultureInfo.InvariantCulture) + "_" + fontStyle.Replace(" ", "_").Replace(",", "_");
         }
 
         private static string GetFontStyle(FontInfo info)
