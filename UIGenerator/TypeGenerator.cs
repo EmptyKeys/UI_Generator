@@ -136,6 +136,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType numeric = new NumericTextBoxGeneratorType();
             Generators.Add(numeric.XamlType, numeric);
+
+            IGeneratorType pass = new PasswordBoxGeneratorType();
+            Generators.Add(pass.XamlType, pass);
         }
 
         /// <summary>
