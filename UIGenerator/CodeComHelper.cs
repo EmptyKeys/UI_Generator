@@ -572,7 +572,23 @@ namespace EmptyKeys.UserInterface.Generator
                         if (commandBindingExpr.ParentBinding.Mode != BindingMode.Default)
                         {
                             GenerateEnumField(method, bindingVar, "Mode", "BindingMode", commandBindingExpr.ParentBinding.Mode.ToString());
-                        }                        
+                        }
+
+                        if (commandBindingExpr.ParentBinding.FallbackValue != DependencyProperty.UnsetValue)
+                        {
+                            object fallBackValue = commandBindingExpr.ParentBinding.FallbackValue;
+                            if (fallBackValue.GetType().IsPrimitive || fallBackValue is string)
+                            {
+                                GenerateField(method, bindingVar, "FallbackValue", fallBackValue);
+                            }
+                            else
+                            {
+                                string warningText = "Only primitive types are supported for FallbackValue.";
+                                Console.WriteLine(warningText);
+                                CodeSnippetStatement warning = new CodeSnippetStatement("#warning " + warningText);
+                                method.Statements.Add(warning);
+                            }
+                        }
                     }
 
                     TemplateBindingExpression templateBinding = entry.Value as TemplateBindingExpression;
@@ -692,7 +708,6 @@ namespace EmptyKeys.UserInterface.Generator
                     {
                         string warningText = property.Name + " attached property not supported.";
                         Console.WriteLine(warningText);
-
                         CodeSnippetStatement warning = new CodeSnippetStatement("#warning " + warningText);
                         method.Statements.Add(warning);
                     }
@@ -776,7 +791,7 @@ namespace EmptyKeys.UserInterface.Generator
             else if (resourceKeyType == typeof(DataTemplateKey))
             {
                 DataTemplateKey dataTemplateKey = resourceKey as DataTemplateKey;
-                keyExpression = new CodeTypeOfExpression(((Type)dataTemplateKey.DataType).Name);
+                keyExpression = new CodeTypeOfExpression(((Type)dataTemplateKey.DataType).FullName);
             }
             else if (resourceKey is Type)
             {

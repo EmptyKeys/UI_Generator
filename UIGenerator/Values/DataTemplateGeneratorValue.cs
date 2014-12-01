@@ -51,7 +51,7 @@ namespace EmptyKeys.UserInterface.Generator.Values
 
             if (dataType != null)
             {
-                return new CodeObjectCreateExpression("DataTemplate", new CodeTypeOfExpression(dataType.Name), new CodeSnippetExpression(creator));
+                return new CodeObjectCreateExpression("DataTemplate", new CodeTypeOfExpression(dataType.FullName), new CodeSnippetExpression(creator));
             }
 
             return new CodeObjectCreateExpression("DataTemplate", new CodeSnippetExpression(creator));

@@ -41,7 +41,9 @@ namespace EmptyKeys.UserInterface.Generator.Types
         {
             CodeExpression fieldReference = base.Generate(source, classType, initMethod, generateField);
 
-            ScrollViewer scrollViewer = source as ScrollViewer;            
+            ScrollViewer scrollViewer = source as ScrollViewer;
+            CodeComHelper.GenerateEnumField<ScrollBarVisibility>(initMethod, fieldReference, source, ScrollViewer.HorizontalScrollBarVisibilityProperty);
+            CodeComHelper.GenerateEnumField<ScrollBarVisibility>(initMethod, fieldReference, source, ScrollViewer.VerticalScrollBarVisibilityProperty);
 
             return fieldReference;
         }
