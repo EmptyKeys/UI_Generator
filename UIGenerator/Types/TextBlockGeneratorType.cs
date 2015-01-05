@@ -46,6 +46,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateBrushToColorField(method, fieldReference, source, TextBlock.ForegroundProperty);
             CodeComHelper.GenerateField<string>(method, fieldReference, source, TextBlock.TextProperty);
             CodeComHelper.GenerateEnumField<TextAlignment>(method, fieldReference, source, TextBlock.TextAlignmentProperty);
+            CodeComHelper.GenerateEnumField<TextWrapping>(method, fieldReference, source, TextBlock.TextWrappingProperty);
 
             FontGenerator.Instance.AddFont(textBlock.FontFamily, textBlock.FontSize, textBlock.FontStyle, textBlock.FontWeight, method);
             CodeComHelper.GenerateFontFamilyField(method, fieldReference, source, TextBlock.FontFamilyProperty);

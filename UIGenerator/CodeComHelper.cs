@@ -53,6 +53,7 @@ namespace EmptyKeys.UserInterface.Generator
             ignoredProperties.Add("XmlnsDictionary");
             ignoredProperties.Add("XmlNamespaceMaps");
             ignoredProperties.Add("IsSelectionActive");
+            ignoredProperties.Add("XmlSpace");
         }
 
         /// <summary>
