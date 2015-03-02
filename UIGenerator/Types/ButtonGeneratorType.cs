@@ -1,13 +1,8 @@
 ﻿using System;
 using System.CodeDom;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
-using System.Windows.Data;
 
 namespace EmptyKeys.UserInterface.Generator.Types
 {
@@ -41,7 +36,8 @@ namespace EmptyKeys.UserInterface.Generator.Types
         public override CodeExpression Generate(DependencyObject source, CodeTypeDeclaration classType, CodeMemberMethod initMethod, bool generateField)
         {
             CodeExpression fieldReference = base.Generate(source, classType, initMethod, generateField);
-            ButtonBase buttonBase = source as ButtonBase;
+            ButtonBase buttonBase = source as ButtonBase;            
+
             CodeComHelper.GenerateField<object>(initMethod, fieldReference, source, ButtonBase.CommandParameterProperty);
             CodeComHelper.GenerateEnumField<ClickMode>(initMethod, fieldReference, source, ButtonBase.ClickModeProperty);
             return fieldReference;

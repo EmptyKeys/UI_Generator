@@ -40,7 +40,9 @@ namespace EmptyKeys.UserInterface.Generator.Values
         public CodeExpression Generate(CodeTypeDeclaration parentClass, CodeMemberMethod method, object value, string baseName, ResourceDictionary dictionary = null)
         {
             string bitmapVarName = baseName + "_bm";
-            return CodeComHelper.GenerateBitmapImageValue(method, value as BitmapImage, bitmapVarName);
+
+            BitmapImage bitmap = value as BitmapImage;
+            return CodeComHelper.GenerateBitmapImageValue(method, bitmap.UriSource, bitmapVarName);
         }
     }
 }

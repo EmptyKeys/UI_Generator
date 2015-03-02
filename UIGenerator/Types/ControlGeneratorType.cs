@@ -46,7 +46,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateBrushField(method, fieldReference, source, Control.BorderBrushProperty);
             CodeComHelper.GenerateThicknessField(method, fieldReference, source, Control.BorderThicknessProperty);
             CodeComHelper.GenerateThicknessField(method, fieldReference, source, Control.PaddingProperty);
-            CodeComHelper.GenerateBrushToColorField(method, fieldReference, source, Control.ForegroundProperty);
+            CodeComHelper.GenerateBrushField(method, fieldReference, source, Control.ForegroundProperty);
             CodeComHelper.GenerateEnumField<HorizontalAlignment>(method, fieldReference, source, Control.HorizontalContentAlignmentProperty);
             CodeComHelper.GenerateEnumField<VerticalAlignment>(method, fieldReference, source, Control.VerticalContentAlignmentProperty);
 

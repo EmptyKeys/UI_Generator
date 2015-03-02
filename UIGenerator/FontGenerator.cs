@@ -54,12 +54,7 @@ namespace EmptyKeys.UserInterface.Generator
         public void AddFont(FontFamily family, double size, FontStyle style, FontWeight weight, CodeMemberMethod method)
         {
             FontInfo info = new FontInfo(family, size, style, weight);
-            if (fonts.ContainsKey(info.GetHashCode()))
-            {
-                return;
-            }
-
-            fonts.Add(info.GetHashCode(), info);
+            fonts[info.GetHashCode()] = info;
 
             string fontName = GetFontName(info);
             float fontSize = GetFontSize(info);

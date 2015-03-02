@@ -43,7 +43,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateBrushField(method, fieldReference, source, Control.BorderBrushProperty);
             CodeComHelper.GenerateThicknessField(method, fieldReference, source, Control.BorderThicknessProperty);
             CodeComHelper.GenerateThicknessField(method, fieldReference, source, Control.PaddingProperty);
-            CodeComHelper.GenerateBrushToColorField(method, fieldReference, source, Control.ForegroundProperty);
+            CodeComHelper.GenerateBrushField(method, fieldReference, source, Control.ForegroundProperty);
 
             CodeComHelper.GenerateTemplateStyleField(classType, method, fieldReference, source, FrameworkElement.StyleProperty);
 

@@ -139,6 +139,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType pass = new PasswordBoxGeneratorType();
             Generators.Add(pass.XamlType, pass);
+
+            IGeneratorType animImage = new AnimatedImageGeneratorType();
+            Generators.Add(animImage.XamlType, animImage);
         }
 
         /// <summary>

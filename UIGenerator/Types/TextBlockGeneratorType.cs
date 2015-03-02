@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Media;
 
 namespace EmptyKeys.UserInterface.Generator.Types
@@ -43,8 +44,28 @@ namespace EmptyKeys.UserInterface.Generator.Types
 
             TextBlock textBlock = source as TextBlock;
             CodeComHelper.GenerateBrushField(method, fieldReference, source, TextBlock.BackgroundProperty);
-            CodeComHelper.GenerateBrushToColorField(method, fieldReference, source, TextBlock.ForegroundProperty);
-            CodeComHelper.GenerateField<string>(method, fieldReference, source, TextBlock.TextProperty);
+            CodeComHelper.GenerateBrushField(method, fieldReference, source, TextBlock.ForegroundProperty);
+
+            if (textBlock.Inlines.Count > 1)
+            {
+                StringBuilder text = new StringBuilder();
+                foreach (var line in textBlock.Inlines)
+                {
+                    Run runLine = line as Run;
+                    if (runLine != null)
+                    {
+                        text.AppendLine(runLine.Text);
+                    }
+                }
+
+                CodeComHelper.GenerateField(method, fieldReference, "Text", text.ToString());
+            }
+            else
+            {
+                CodeComHelper.GenerateField<string>(method, fieldReference, source, TextBlock.TextProperty);
+            }
+
+
             CodeComHelper.GenerateEnumField<TextAlignment>(method, fieldReference, source, TextBlock.TextAlignmentProperty);
             CodeComHelper.GenerateEnumField<TextWrapping>(method, fieldReference, source, TextBlock.TextWrappingProperty);
 

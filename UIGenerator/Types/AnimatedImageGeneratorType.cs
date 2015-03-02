@@ -10,13 +10,14 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Media;
 using System.Windows.Media.Imaging;
+using EmptyKeys.UserInterface.Designer;
 
 namespace EmptyKeys.UserInterface.Generator.Types
 {
     /// <summary>
     /// Implements Image control generator
     /// </summary>
-    public class ImageGeneratorType : ElementGeneratorType
+    public class AnimatedImageGeneratorType : ImageGeneratorType
     {
         /// <summary>
         /// Gets the type of the xaml.
@@ -28,7 +29,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
         {
             get
             {
-                return typeof(Image);
+                return typeof(AnimatedImage);
             }
         }
 
@@ -42,17 +43,12 @@ namespace EmptyKeys.UserInterface.Generator.Types
         /// <returns></returns>
         public override CodeExpression Generate(DependencyObject source, CodeTypeDeclaration classType, CodeMemberMethod method, bool generateField)
         {
-            CodeExpression fieldReference = base.Generate(source, classType, method, generateField);
+            CodeExpression fieldReference = base.Generate(source, classType, method, generateField);            
 
-            Image image = source as Image;
-
-            BitmapImage bitmap = image.Source as BitmapImage;
-            if (bitmap != null)
-            {
-                CodeComHelper.GenerateBitmapImageField(method, fieldReference, bitmap.UriSource, image.Name + "_bm", "Source");
-            }
-                     
-            CodeComHelper.GenerateEnumField<Stretch>(method, fieldReference, source, Image.StretchProperty);
+            CodeComHelper.GenerateField<int>(method, fieldReference, source, AnimatedImage.FrameWidthProperty);
+            CodeComHelper.GenerateField<int>(method, fieldReference, source, AnimatedImage.FrameHeightProperty);
+            CodeComHelper.GenerateField<int>(method, fieldReference, source, AnimatedImage.FramesPerSecondProperty);
+            
             return fieldReference;
         }        
     }

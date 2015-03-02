@@ -57,6 +57,8 @@
     </Page>
   </ItemGroup>
   <ItemGroup>
+    <Compile Include="AnimatedImageBrush.cs" />
+    <Compile Include="AnimatedImage.cs" />
     <Compile Include="NumericTextBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
@@ -71,6 +73,8 @@
       <DependentUpon>Settings.settings</DependentUpon>
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
+    <Compile Include="RoutedEvents.cs" />
+    <Compile Include="SolidColorBrushAnimation.cs" />
     <Compile Include="SoundManager.cs" />
     <Compile Include="SoundSource.cs" />
     <Compile Include="SoundSourceCollection.cs" />

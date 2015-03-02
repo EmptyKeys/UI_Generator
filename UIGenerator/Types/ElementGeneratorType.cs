@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Media.Animation;
 
 namespace EmptyKeys.UserInterface.Generator.Types
 {
@@ -14,7 +15,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
     /// </summary>
     public class ElementGeneratorType : IGeneratorType
     {
-        private static int nameUniqueId;
+        private static int nameUniqueId;        
 
         /// <summary>
         /// Gets the type of the xaml.
@@ -61,7 +62,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
                 CodeMemberField field = new CodeMemberField(typeName, element.Name);
                 classType.Members.Add(field);
             }
-            
+
             CodeComment comment = new CodeComment(element.Name + " element");
             method.Statements.Add(new CodeCommentStatement(comment));
 
@@ -98,9 +99,32 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateEnumField<VerticalAlignment>(method, fieldReference, source, FrameworkElement.VerticalAlignmentProperty);
             CodeComHelper.GenerateTemplateStyleField(classType, method, fieldReference, source, FrameworkElement.StyleProperty);
             CodeComHelper.GenerateToolTipField(classType, method, fieldReference, source, FrameworkElement.ToolTipProperty);
+            CodeComHelper.GenerateFieldDoubleToFloat(method, fieldReference, source, FrameworkElement.OpacityProperty);
+
+            if (element.Triggers.Count > 0)
+            {                                
+                string parentName = element.Name;
+
+                GenerateTriggers(classType, method, element, typeName, fieldReference, parentName);
+
+            }
 
             return fieldReference;
         }
+
+        private static void GenerateTriggers(CodeTypeDeclaration parentClass, CodeMemberMethod method, FrameworkElement element, string typeName, CodeExpression fieldReference, string parentName)
+        {
+            for (int i = 0; i < element.Triggers.Count; i++)
+            {
+                EventTrigger trigger = element.Triggers[i] as EventTrigger;
+                if (trigger == null)
+                {
+                    continue;
+                }
+
+                CodeComHelper.GenerateEventTrigger(parentClass, method, typeName, fieldReference, parentName, i, trigger);
+            }
+        }              
 
         /// <summary>
         /// Adds the child.
@@ -110,7 +134,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
         /// <param name="initMethod">The initialize method.</param>
         /// <param name="index">The index.</param>
         public virtual void AddChild(CodeExpression parent, CodeExpression child, CodeMemberMethod initMethod, int index)
-        {            
+        {
         }
     }
 }

@@ -71,6 +71,7 @@ namespace EmptyKeys.UserInterface.Generator
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls.Primitives"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Animation"));            
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Imaging"));            
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));
 

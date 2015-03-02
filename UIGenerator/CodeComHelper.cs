@@ -13,6 +13,7 @@ using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
 using System.Windows.Media;
+using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using EmptyKeys.UserInterface.Designer;
 
@@ -47,6 +48,13 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("Placement");
             supportedAttachedProperties.Add("ShowDuration");
             supportedAttachedProperties.Add("InitialShowDelay");
+            supportedAttachedProperties.Add("Target");
+            supportedAttachedProperties.Add("TargetName");
+            supportedAttachedProperties.Add("TargetProperty");
+            supportedAttachedProperties.Add("FrameWidth");
+            supportedAttachedProperties.Add("FrameHeight");
+            supportedAttachedProperties.Add("FramesPerSecond");
+            supportedAttachedProperties.Add("Animate");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");
@@ -113,7 +121,14 @@ namespace EmptyKeys.UserInterface.Generator
             }
         }
 
-        private static void GenerateField(CodeMemberMethod method, CodeExpression target, string fieldName, object value)
+        /// <summary>
+        /// Generates the field.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <param name="value">The value.</param>
+        public static void GenerateField(CodeMemberMethod method, CodeExpression target, string fieldName, object value)
         {
             method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(target, fieldName), new CodePrimitiveExpression(value)));
         }
@@ -182,7 +197,7 @@ namespace EmptyKeys.UserInterface.Generator
                     CodeMemberMethod initTemplateMethod = new CodeMemberMethod();
                     initTemplateMethod.ReturnType = new CodeTypeReference("UIElement");
                     initTemplateMethod.Name = variableName + "_Method";
-                    
+
                     TypeGenerator generator = new TypeGenerator();
                     contentExpr = generator.ProcessGenerators(content, parentClass, initTemplateMethod, false);
 
@@ -399,18 +414,7 @@ namespace EmptyKeys.UserInterface.Generator
             ImageBrush image = brush as ImageBrush;
             if (image != null)
             {
-                CodeVariableDeclarationStatement variable = new CodeVariableDeclarationStatement(
-                    "ImageBrush", variableName,
-                    new CodeObjectCreateExpression(brushTypeName));
-                method.Statements.Add(variable);
-                brushExpr = new CodeVariableReferenceExpression(variableName);
-
-                BitmapImage bitmap = image.ImageSource as BitmapImage;
-                if (bitmap != null)
-                {
-                    GenerateBitmapImageField(method, brushExpr, bitmap, variableName + "_bm", "ImageSource");
-                }
-
+                brushExpr = GenerateImageBrush(method, variableName, brushTypeName, brushExpr, image);
                 return brushExpr;
             }
 
@@ -419,17 +423,57 @@ namespace EmptyKeys.UserInterface.Generator
             return brushExpr;
         }
 
+        private static CodeExpression GenerateImageBrush(CodeMemberMethod method, string variableName, string brushTypeName, CodeExpression brushExpr, ImageBrush image)
+        {
+            CodeVariableDeclarationStatement variable = new CodeVariableDeclarationStatement(
+                "ImageBrush", variableName,
+                new CodeObjectCreateExpression(brushTypeName));
+            method.Statements.Add(variable);
+            brushExpr = new CodeVariableReferenceExpression(variableName);
+
+            BitmapImage bitmap = image.ImageSource as BitmapImage;
+            if (bitmap != null)
+            {
+                GenerateBitmapImageField(method, brushExpr, bitmap.UriSource, variableName + "_bm", "ImageSource");
+            }
+
+            GenerateEnumField<Stretch>(method, brushExpr, image, ImageBrush.StretchProperty);
+            GenerateEnumField<BrushMappingMode>(method, brushExpr, image, ImageBrush.ViewboxUnitsProperty);
+            GenerateRect(method, brushExpr, image, ImageBrush.ViewboxProperty);
+
+            GenerateAttachedProperties(method, brushExpr, image);
+
+            return brushExpr;
+        }
+
+        private static void GenerateRect(CodeMemberMethod method, CodeExpression brushExpr, DependencyObject source, DependencyProperty property)
+        {
+            if (IsValidForFieldGenerator(source.ReadLocalValue(property)))
+            {
+                Rect value = (Rect)source.GetValue(property);
+
+                method.Statements.Add(new CodeAssignStatement(
+                    new CodeFieldReferenceExpression(brushExpr, "Viewbox"),
+                    new CodeObjectCreateExpression("Rect",
+                        new CodePrimitiveExpression((float)value.X),
+                        new CodePrimitiveExpression((float)value.Y),
+                        new CodePrimitiveExpression((float)value.Width),
+                        new CodePrimitiveExpression((float)value.Height)
+                        )));
+            }
+        }
+
         /// <summary>
         /// Generates the bitmap image.
         /// </summary>
         /// <param name="method">The method.</param>
         /// <param name="fieldReference">The field reference.</param>
-        /// <param name="bitmap">The bitmap.</param>
+        /// <param name="uriSource">The URI source.</param>
         /// <param name="variableName">Name of the variable.</param>
         /// <param name="sourceProperty">The asset property.</param>
-        public static void GenerateBitmapImageField(CodeMemberMethod method, CodeExpression fieldReference, BitmapImage bitmap, string variableName, string sourceProperty)
+        public static void GenerateBitmapImageField(CodeMemberMethod method, CodeExpression fieldReference, Uri uriSource, string variableName, string sourceProperty)
         {
-            GenerateBitmapImageValue(method, bitmap, variableName);
+            GenerateBitmapImageValue(method, uriSource, variableName);
 
             method.Statements.Add(new CodeAssignStatement(
                 new CodeFieldReferenceExpression(fieldReference, sourceProperty),
@@ -440,19 +484,19 @@ namespace EmptyKeys.UserInterface.Generator
         /// Generates the bitmap image value.
         /// </summary>
         /// <param name="method">The method.</param>
-        /// <param name="bitmap">The bitmap.</param>
+        /// <param name="uriSource">The URI source.</param>
         /// <param name="variableName">Name of the variable.</param>
         /// <returns></returns>
-        public static CodeExpression GenerateBitmapImageValue(CodeMemberMethod method, BitmapImage bitmap, string variableName)
+        public static CodeExpression GenerateBitmapImageValue(CodeMemberMethod method, Uri uriSource, string variableName)
         {
             string imageAsset;
-            if (bitmap.UriSource.IsAbsoluteUri)
+            if (uriSource.IsAbsoluteUri)
             {
-                imageAsset = bitmap.UriSource.LocalPath;
+                imageAsset = uriSource.LocalPath;
             }
             else
             {
-                imageAsset = bitmap.UriSource.OriginalString;
+                imageAsset = uriSource.OriginalString;
             }
 
             string extension = Path.GetExtension(imageAsset);
@@ -676,7 +720,8 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="method">The method.</param>
         /// <param name="target">The target.</param>
         /// <param name="source">The source.</param>
-        public static void GenerateAttachedProperties(CodeMemberMethod method, CodeExpression target, DependencyObject source)
+        /// <param name="propertyParentTypeName">Name of the property parent type.</param>
+        public static void GenerateAttachedProperties(CodeMemberMethod method, CodeExpression target, DependencyObject source, string propertyParentTypeName = null)
         {
             List<DependencyProperty> attachedProperties = GetAttachedProperties(source);
             foreach (var property in attachedProperties)
@@ -696,6 +741,35 @@ namespace EmptyKeys.UserInterface.Generator
                                     new CodeVariableDeclarationStatement("var", collVar, new CodeMethodInvokeExpression(typeReference, "Get" + property.Name, target));
                             method.Statements.Add(collection);
                             GenerateSoundSources(method, sounds, collVar);
+                        }
+                        else if (value is PropertyPath)
+                        {
+                            var path = value as PropertyPath;
+
+                            CodeMethodInvokeExpression setValue = null;
+                            if (path.PathParameters.Count == 0)
+                            {
+                                setValue = new CodeMethodInvokeExpression(typeReference, "Set" + property.Name, target,
+                                    new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(propertyParentTypeName), path.Path + "Property"));
+                            }
+                            else
+                            {
+                                DependencyProperty dependencyProperty = path.PathParameters[0] as DependencyProperty;
+                                if (dependencyProperty != null)
+                                {
+                                    setValue = new CodeMethodInvokeExpression(typeReference, "Set" + property.Name, target,
+                                        new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(dependencyProperty.OwnerType.Name), dependencyProperty.Name + "Property"));
+                                }
+                                else
+                                {
+                                    CodeComHelper.GenerateError(method, "Event Trigger property not resolved");
+                                }
+                            }
+
+                            if (setValue != null)
+                            {
+                                method.Statements.Add(setValue);
+                            }
                         }
                         else
                         {
@@ -814,10 +888,10 @@ namespace EmptyKeys.UserInterface.Generator
         /// <returns></returns>
         public static CodeExpression GetValueExpression(CodeTypeDeclaration parentClass, CodeMemberMethod method, object value, string baseName, ResourceDictionary dictionary = null)
         {
-            ValueGenerator generator = new ValueGenerator();            
-            CodeExpression valueExpression = generator.ProcessGenerators(parentClass, method, value, baseName, dictionary);           
+            ValueGenerator generator = new ValueGenerator();
+            CodeExpression valueExpression = generator.ProcessGenerators(parentClass, method, value, baseName, dictionary);
             return valueExpression;
-        }                                       
+        }
 
         /// <summary>
         /// Generates the template.
@@ -880,15 +954,20 @@ namespace EmptyKeys.UserInterface.Generator
                 {
                     GenerateTrigger(parentClass, method, variableName, targetType, triggerIndex, trigger);
                     triggerIndex++;
+                    continue;
                 }
-                else
-                {
-                    string errorText = string.Format("Trigger type {0} not supported.", triggerBase.GetType().Name);
-                    Console.WriteLine(errorText);
 
-                    CodeSnippetStatement error = new CodeSnippetStatement("#error " + errorText);
-                    method.Statements.Add(error);
+                EventTrigger eventTrigger = triggerBase as EventTrigger;
+                if (eventTrigger != null)
+                {
+                    GenerateEventTrigger(parentClass, method, targetType.Name, null, variableName, triggerIndex, eventTrigger);
+                    triggerIndex++;
+                    continue;
                 }
+
+                string errorText = string.Format("Trigger type {0} not supported.", triggerBase.GetType().Name);
+                Console.WriteLine(errorText);
+                GenerateError(method, errorText);
             }
         }
 
@@ -989,6 +1068,180 @@ namespace EmptyKeys.UserInterface.Generator
 
                 CodeSnippetStatement error = new CodeSnippetStatement("#error " + errorText);
                 method.Statements.Add(error);
+            }
+        }
+
+        /// <summary>
+        /// Generates the event trigger.
+        /// </summary>
+        /// <param name="parentClass">The parent class.</param>
+        /// <param name="method">The method.</param>
+        /// <param name="typeName">Name of the type.</param>
+        /// <param name="fieldReference">The field reference.</param>
+        /// <param name="parentName">Name of the parent.</param>
+        /// <param name="index">The index.</param>
+        /// <param name="trigger">The trigger.</param>
+        public static void GenerateEventTrigger(CodeTypeDeclaration parentClass, CodeMemberMethod method, string typeName, CodeExpression fieldReference, string parentName, int index, EventTrigger trigger)
+        {
+            string triggerVarName = parentName + "_ET_" + index;
+            var routedEvent = new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeName), trigger.RoutedEvent.Name + "Event");
+
+            if (fieldReference != null)
+            {
+                var triggerVar = new CodeVariableDeclarationStatement("EventTrigger", triggerVarName, new CodeObjectCreateExpression("EventTrigger", routedEvent, fieldReference));
+                method.Statements.Add(triggerVar);
+            }
+            else
+            {
+                var triggerVar = new CodeVariableDeclarationStatement("EventTrigger", triggerVarName, new CodeObjectCreateExpression("EventTrigger", routedEvent));
+                method.Statements.Add(triggerVar);
+            }
+
+            var addTrigger = new CodeMethodInvokeExpression(
+                    new CodeVariableReferenceExpression(parentName), "Triggers.Add", new CodeVariableReferenceExpression(triggerVarName));
+            method.Statements.Add(addTrigger);
+
+            for (int j = 0; j < trigger.Actions.Count; j++)
+            {
+                BeginStoryboard beginStoryboard = trigger.Actions[j] as BeginStoryboard;
+                if (beginStoryboard == null)
+                {
+                    continue;
+                }
+
+                string actionName = beginStoryboard.Name;
+                if (string.IsNullOrEmpty(actionName))
+                {
+                    actionName = triggerVarName + "_AC_" + j;
+                }
+
+                var beginStoryboardVar = new CodeVariableDeclarationStatement("BeginStoryboard", actionName, new CodeObjectCreateExpression("BeginStoryboard"));
+                method.Statements.Add(beginStoryboardVar);
+
+                var nameAssign = new CodeAssignStatement(
+                    new CodeFieldReferenceExpression(new CodeVariableReferenceExpression(actionName), "Name"),
+                    new CodePrimitiveExpression(actionName));
+                method.Statements.Add(nameAssign);
+
+                var addAction = new CodeMethodInvokeExpression(
+                    new CodeVariableReferenceExpression(triggerVarName), "AddAction", new CodeVariableReferenceExpression(actionName));
+                method.Statements.Add(addAction);
+
+                if (beginStoryboard.Storyboard != null)
+                {
+                    GenerateStoryboard(parentClass, method, beginStoryboard.Storyboard, actionName, typeName);
+                }
+            }
+        }
+
+        private static void GenerateStoryboard(CodeTypeDeclaration classType, CodeMemberMethod method, Storyboard storyboard, string actionName, string typeName)
+        {
+            string storyboardName = storyboard.Name;
+            if (string.IsNullOrEmpty(storyboardName))
+            {
+                storyboardName = actionName + "_SB";
+            }
+
+            var storyboardVar = new CodeVariableDeclarationStatement("Storyboard", storyboardName, new CodeObjectCreateExpression("Storyboard"));
+            method.Statements.Add(storyboardVar);
+
+            var storyboardAssign = new CodeAssignStatement(
+                new CodeFieldReferenceExpression(new CodeVariableReferenceExpression(actionName), "Storyboard"),
+                new CodeVariableReferenceExpression(storyboardName));
+            method.Statements.Add(storyboardAssign);
+
+            var nameAssign = new CodeAssignStatement(
+                            new CodeFieldReferenceExpression(new CodeVariableReferenceExpression(storyboardName), "Name"),
+                            new CodePrimitiveExpression(storyboardName));
+            method.Statements.Add(nameAssign);
+
+            for (int i = 0; i < storyboard.Children.Count; i++)
+            {
+                var timeline = storyboard.Children[i];
+                string timelineName = timeline.Name;
+                if (string.IsNullOrEmpty(timelineName))
+                {
+                    timelineName = storyboardName + "_TL_" + i;
+                }
+
+                CodeExpression timelineValueExpr = CodeComHelper.GetValueExpression(classType, method, timeline, timelineName);
+
+                CodeComHelper.GenerateAttachedProperties(method, timelineValueExpr, timeline, typeName);
+
+                var addTimeline = new CodeMethodInvokeExpression(new CodeVariableReferenceExpression(storyboardName), "Children.Add", timelineValueExpr);
+                method.Statements.Add(addTimeline);
+            }
+        }
+
+        /// <summary>
+        /// Generates the easing function.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <param name="parentAnimation">The parent animation.</param>
+        /// <param name="baseName">Name of the base.</param>
+        /// <param name="easingFunc">The easing function.</param>
+        public static void GenerateEasingFunction(CodeMemberMethod method, CodeExpression parentAnimation, string baseName, EasingFunctionBase easingFunc)
+        {
+            string easingName = baseName + "_EA";
+            string easingType = easingFunc.GetType().Name;
+            var easingVar = new CodeVariableDeclarationStatement(easingType, easingName, new CodeObjectCreateExpression(easingType));
+            method.Statements.Add(easingVar);
+
+            var easingVarRef = new CodeVariableReferenceExpression(easingName);
+            var easingAssign = new CodeAssignStatement(new CodeFieldReferenceExpression(parentAnimation, "EasingFunction"), easingVarRef);
+            method.Statements.Add(easingAssign);
+
+            CodeComHelper.GenerateEnumField<EasingMode>(method, easingVarRef, easingFunc, EasingFunctionBase.EasingModeProperty);
+
+            BackEase backEase = easingFunc as BackEase;
+            if (backEase != null)
+            {
+                CodeComHelper.GenerateFieldDoubleToFloat(method, easingVarRef, backEase, BackEase.AmplitudeProperty);
+                return;
+            }
+
+            ElasticEase elastic = easingFunc as ElasticEase;
+            if (elastic != null)
+            {
+                CodeComHelper.GenerateField<int>(method, easingVarRef, elastic, ElasticEase.OscillationsProperty);
+                CodeComHelper.GenerateFieldDoubleToFloat(method, easingVarRef, elastic, ElasticEase.SpringinessProperty);
+                return;
+            }
+
+            ExponentialEase expo = easingFunc as ExponentialEase;
+            if (expo != null)
+            {
+                CodeComHelper.GenerateFieldDoubleToFloat(method, easingVarRef, expo, ExponentialEase.ExponentProperty);
+                return;
+            }
+
+            PowerEase power = easingFunc as PowerEase;
+            if (power != null)
+            {
+                CodeComHelper.GenerateFieldDoubleToFloat(method, easingVarRef, power, PowerEase.PowerProperty);
+            }
+        }
+
+        /// <summary>
+        /// Generates the color field.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="property">The property.</param>
+        public static void GenerateColorField(CodeMemberMethod method, CodeExpression target, SolidColorBrushAnimation source, DependencyProperty property)
+        {
+            if (IsValidForFieldGenerator(source.ReadLocalValue(property)))
+            {
+                Color value = (Color)source.GetValue(property);
+                method.Statements.Add(new CodeAssignStatement(
+                    new CodeFieldReferenceExpression(target, property.Name),
+                    new CodeObjectCreateExpression("Color",
+                        new CodePrimitiveExpression(value.R),
+                        new CodePrimitiveExpression(value.G),
+                        new CodePrimitiveExpression(value.B),
+                        new CodePrimitiveExpression(value.A))
+                    ));
             }
         }
     }

@@ -105,6 +105,15 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorValue thickness = new ThicknessGeneratorValue();
             Generators.Add(thickness.ValueType, thickness);
+
+            IGeneratorValue doubleAnim = new DoubleAnimationGeneratorValue();
+            Generators.Add(doubleAnim.ValueType, doubleAnim);
+
+            IGeneratorValue brushAnim = new SolidColorBrushAnimGeneratorValue();
+            Generators.Add(brushAnim.ValueType, brushAnim);
+
+            IGeneratorValue thicknessAnim = new ThicknessAnimationGeneratorValue();
+            Generators.Add(thicknessAnim.ValueType, thicknessAnim);
         }
 
         /// <summary>
