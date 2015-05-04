@@ -61,10 +61,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderMode.cs" />
     <Compile Include="ResourceDictionaryGenerator.cs" />
+    <Compile Include="Types\Controls\DockPanelGeneratorType.cs" />
+    <Compile Include="Types\Controls\CanvasGeneratorType.cs" />
     <Compile Include="Types\CustomUserControlGeneratorType.cs" />
     <Compile Include="Types\AnimatedImageGeneratorType.cs" />
     <Compile Include="Types\NumericTextBoxGeneratorType.cs" />
     <Compile Include="Types\PasswordBoxGeneratorType.cs" />
+    <Compile Include="Types\Shapes\PathGeneratorType.cs" />
+    <Compile Include="Types\Shapes\EllipseGeneratorType.cs" />
+    <Compile Include="Types\Shapes\RectangleGeneratorType.cs" />
+    <Compile Include="Types\Shapes\ShapeGeneratorType.cs" />
     <Compile Include="Types\SliderGeneratorType.cs" />
     <Compile Include="Types\ThumbGeneratorType.cs" />
     <Compile Include="Types\TrackGeneratorType.cs" />
@@ -107,6 +113,8 @@
     <Compile Include="Values\BitmapImageGeneratorValue.cs" />
     <Compile Include="Values\BrushGeneratorValue.cs" />
     <Compile Include="Values\DoubleAnimationGeneratorValue.cs" />
+    <Compile Include="Values\EllipseGeometryGeneratorValue.cs" />
+    <Compile Include="Values\RectangleGeometryGeneratorValue.cs" />
     <Compile Include="Values\SolidColorBrushAnimGeneratorValue.cs" />
     <Compile Include="Values\ThicknessAnimationGeneratorValue.cs" />
     <Compile Include="Values\ThicknessGeneratorValue.cs" />

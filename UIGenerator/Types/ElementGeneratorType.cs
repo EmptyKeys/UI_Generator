@@ -6,6 +6,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Input;
 using System.Windows.Media.Animation;
 
 namespace EmptyKeys.UserInterface.Generator.Types
@@ -15,7 +16,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
     /// </summary>
     public class ElementGeneratorType : IGeneratorType
     {
-        private static int nameUniqueId;        
+        private static int nameUniqueId;
 
         /// <summary>
         /// Gets the type of the xaml.
@@ -102,14 +103,73 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateFieldDoubleToFloat(method, fieldReference, source, FrameworkElement.OpacityProperty);
 
             if (element.Triggers.Count > 0)
-            {                                
+            {
                 string parentName = element.Name;
-
                 GenerateTriggers(classType, method, element, typeName, fieldReference, parentName);
+            }
 
+            if (element.InputBindings.Count > 0)
+            {                
+                GenerateInputBindings(method, element);
             }
 
             return fieldReference;
+        }
+
+        private static void GenerateInputBindings(CodeMemberMethod method, FrameworkElement element)
+        {
+            for (int i = 0; i < element.InputBindings.Count; i++)
+            {
+                CodeVariableDeclarationStatement bindingVar = null;
+                string bindingVarName = element.Name + "_IB_" + i;
+                var bindingVarRef = new CodeVariableReferenceExpression(bindingVarName);
+                MouseBinding mouseBinding = element.InputBindings[i] as MouseBinding;
+                if (mouseBinding != null)
+                {
+                    bindingVar = new CodeVariableDeclarationStatement("MouseBinding", bindingVarName, new CodeObjectCreateExpression("MouseBinding"));
+                    method.Statements.Add(bindingVar);
+
+                    MouseGesture mouseGesture = mouseBinding.Gesture as MouseGesture;
+                    if (mouseGesture != null)
+                    {
+                        method.Statements.Add(new CodeAssignStatement(
+                            new CodeFieldReferenceExpression(bindingVarRef, "Gesture"),
+                            new CodeObjectCreateExpression("MouseGesture",
+                                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(MouseAction).Name), mouseGesture.MouseAction.ToString()),
+                                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(ModifierKeys).Name), mouseGesture.Modifiers.ToString())
+                                )));
+                    }
+                }
+
+                KeyBinding keyBinding = element.InputBindings[i] as KeyBinding;
+                if (keyBinding != null)
+                {
+                    bindingVar = new CodeVariableDeclarationStatement("KeyBinding", bindingVarName, new CodeObjectCreateExpression("KeyBinding"));
+                    method.Statements.Add(bindingVar);
+
+                    KeyGesture keyGesture = keyBinding.Gesture as KeyGesture;
+                    if (keyGesture != null)
+                    {
+                        method.Statements.Add(new CodeAssignStatement(
+                            new CodeFieldReferenceExpression(bindingVarRef, "Gesture"),
+                            new CodeObjectCreateExpression("KeyGesture",
+                                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression("KeyCode"), keyGesture.Key.ToString()),
+                                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(ModifierKeys).Name), keyGesture.Modifiers.ToString()),
+                                new CodePrimitiveExpression(keyGesture.DisplayString)
+                                )));
+                    }
+                }
+
+                if (bindingVar != null)
+                {
+                    DependencyObject depObject = element.InputBindings[i] as DependencyObject;                    
+                    CodeComHelper.GenerateField<object>(method, bindingVarRef, depObject, InputBinding.CommandParameterProperty);
+                    CodeComHelper.GenerateBindings(method, bindingVarRef, depObject, bindingVarName);
+
+                    method.Statements.Add(new CodeMethodInvokeExpression(
+                        new CodeVariableReferenceExpression(element.Name), "InputBindings.Add", new CodeVariableReferenceExpression(bindingVarName)));
+                }
+            }
         }
 
         private static void GenerateTriggers(CodeTypeDeclaration parentClass, CodeMemberMethod method, FrameworkElement element, string typeName, CodeExpression fieldReference, string parentName)
@@ -124,7 +184,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
 
                 CodeComHelper.GenerateEventTrigger(parentClass, method, typeName, fieldReference, parentName, i, trigger);
             }
-        }              
+        }
 
         /// <summary>
         /// Adds the child.

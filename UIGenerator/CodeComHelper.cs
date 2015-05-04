@@ -55,6 +55,14 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("FrameHeight");
             supportedAttachedProperties.Add("FramesPerSecond");
             supportedAttachedProperties.Add("Animate");
+            supportedAttachedProperties.Add("Left");
+            supportedAttachedProperties.Add("Right");
+            supportedAttachedProperties.Add("Top");
+            supportedAttachedProperties.Add("Bottom");
+            supportedAttachedProperties.Add("Dock");
+            supportedAttachedProperties.Add("Action");
+            supportedAttachedProperties.Add("VerticalOffset");
+            supportedAttachedProperties.Add("HorizontalOffset");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");
@@ -186,38 +194,40 @@ namespace EmptyKeys.UserInterface.Generator
                     CodeComHelper.GenerateEnumField<PlacementMode>(method, variableExpr, toolTip, ToolTip.PlacementProperty);
                 }
 
-                CodeExpression contentExpr = null;
-                Type contentType = content.GetType();
-                if (contentType.IsPrimitive || content is string)
+                if (content != null)
                 {
-                    contentExpr = new CodePrimitiveExpression(content);
-                }
-                else if (contentType.IsSubclassOf(typeof(FrameworkElement)))
-                {
-                    CodeMemberMethod initTemplateMethod = new CodeMemberMethod();
-                    initTemplateMethod.ReturnType = new CodeTypeReference("UIElement");
-                    initTemplateMethod.Name = variableName + "_Method";
-
-                    TypeGenerator generator = new TypeGenerator();
-                    contentExpr = generator.ProcessGenerators(content, parentClass, initTemplateMethod, false);
-
-                    if (initTemplateMethod.Statements.Count < 1)
+                    CodeExpression contentExpr = null;
+                    Type contentType = content.GetType();
+                    if (contentType.IsPrimitive || content is string)
                     {
-                        contentExpr = new CodePrimitiveExpression(string.Empty);
+                        contentExpr = new CodePrimitiveExpression(content);
                     }
-                    else
+                    else if (contentType.IsSubclassOf(typeof(FrameworkElement)))
                     {
-                        CodeVariableDeclarationStatement firstStatement = initTemplateMethod.Statements[1] as CodeVariableDeclarationStatement;
-                        CodeMethodReturnStatement returnInitTemplateMethod = new CodeMethodReturnStatement(new CodeVariableReferenceExpression(firstStatement.Name));
-                        initTemplateMethod.Statements.Add(returnInitTemplateMethod);
-                        parentClass.Members.Add(initTemplateMethod);
+                        CodeMemberMethod initTemplateMethod = new CodeMemberMethod();
+                        initTemplateMethod.ReturnType = new CodeTypeReference("UIElement");
+                        initTemplateMethod.Name = variableName + "_Method";
 
-                        contentExpr = new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), initTemplateMethod.Name);
+                        TypeGenerator generator = new TypeGenerator();
+                        contentExpr = generator.ProcessGenerators(content, parentClass, initTemplateMethod, false);
+
+                        if (initTemplateMethod.Statements.Count < 1)
+                        {
+                            contentExpr = new CodePrimitiveExpression(string.Empty);
+                        }
+                        else
+                        {
+                            CodeVariableDeclarationStatement firstStatement = initTemplateMethod.Statements[1] as CodeVariableDeclarationStatement;
+                            CodeMethodReturnStatement returnInitTemplateMethod = new CodeMethodReturnStatement(new CodeVariableReferenceExpression(firstStatement.Name));
+                            initTemplateMethod.Statements.Add(returnInitTemplateMethod);
+                            parentClass.Members.Add(initTemplateMethod);
+
+                            contentExpr = new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), initTemplateMethod.Name);
+                        }
                     }
+
+                    method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(variableExpr, "Content"), contentExpr));
                 }
-
-                method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(variableExpr, "Content"), contentExpr));
-
             }
         }
 
@@ -364,7 +374,7 @@ namespace EmptyKeys.UserInterface.Generator
             if (solid != null)
             {
                 CodeObjectCreateExpression colorExpr = new CodeObjectCreateExpression(
-                    "Color",
+                    "ColorW",
                     new CodePrimitiveExpression(solid.Color.R),
                     new CodePrimitiveExpression(solid.Color.G),
                     new CodePrimitiveExpression(solid.Color.B),
@@ -384,22 +394,28 @@ namespace EmptyKeys.UserInterface.Generator
 
                 method.Statements.Add(new CodeAssignStatement(
                     new CodeFieldReferenceExpression(brushExpr, "StartPoint"),
-                    new CodeObjectCreateExpression("Vector2",
+                    new CodeObjectCreateExpression("PointF",
                         new CodePrimitiveExpression((float)linear.StartPoint.X),
                         new CodePrimitiveExpression((float)linear.StartPoint.Y))));
 
                 method.Statements.Add(new CodeAssignStatement(
-                    new CodeFieldReferenceExpression(brushExpr, "EndPoint "),
-                    new CodeObjectCreateExpression("Vector2",
+                    new CodeFieldReferenceExpression(brushExpr, "EndPoint"),
+                    new CodeObjectCreateExpression("PointF",
                         new CodePrimitiveExpression((float)linear.EndPoint.X),
                         new CodePrimitiveExpression((float)linear.EndPoint.Y))));
+                
+                var spread = linear.SpreadMethod;
+                CodeTypeReferenceExpression enumType = new CodeTypeReferenceExpression(spread.GetType().Name);
+                method.Statements.Add(new CodeAssignStatement(
+                    new CodeFieldReferenceExpression(brushExpr, "SpreadMethod"),
+                    new CodeFieldReferenceExpression(enumType, spread.ToString())));
 
                 foreach (var stop in linear.GradientStops)
                 {
                     CodeMethodInvokeExpression gradientStop = new CodeMethodInvokeExpression(
                             brushExpr, "GradientStops.Add",
                             new CodeObjectCreateExpression("GradientStop",
-                                new CodeObjectCreateExpression("Color",
+                                new CodeObjectCreateExpression("ColorW",
                                     new CodePrimitiveExpression(stop.Color.R),
                                     new CodePrimitiveExpression(stop.Color.G),
                                     new CodePrimitiveExpression(stop.Color.B),
@@ -550,7 +566,7 @@ namespace EmptyKeys.UserInterface.Generator
                 if (solid != null)
                 {
                     colorExpr = new CodeObjectCreateExpression(
-                        "Color",
+                        "ColorW",
                         new CodePrimitiveExpression(solid.Color.R),
                         new CodePrimitiveExpression(solid.Color.G),
                         new CodePrimitiveExpression(solid.Color.B),
@@ -571,7 +587,12 @@ namespace EmptyKeys.UserInterface.Generator
             }
         }
 
-        private static bool IsValidForFieldGenerator(object value)
+        /// <summary>
+        /// Determines whether [is valid for field generator] [the specified value].
+        /// </summary>
+        /// <param name="value">The value.</param>
+        /// <returns></returns>
+        public static bool IsValidForFieldGenerator(object value)
         {
             if (value != DependencyProperty.UnsetValue &&
                 !IsResourceReferenceExpression(value) &&
@@ -589,7 +610,8 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="method">The method.</param>
         /// <param name="target">The target.</param>
         /// <param name="source">The source.</param>
-        public static void GenerateBindings(CodeMemberMethod method, CodeExpression target, FrameworkElement source)
+        /// <param name="sourceName">Name of the source.</param>
+        public static void GenerateBindings(CodeMemberMethod method, CodeExpression target, DependencyObject source, string sourceName)
         {
             LocalValueEnumerator enumerator = source.GetLocalValueEnumerator();
             while (enumerator.MoveNext())
@@ -603,10 +625,19 @@ namespace EmptyKeys.UserInterface.Generator
                     {
                         PropertyPath path = commandBindingExpr.ParentBinding.Path;
 
-                        CodeVariableReferenceExpression bindingVar = new CodeVariableReferenceExpression(string.Format("{0}_{1}_{2}", "binding", source.Name, property.Name));
+                        CodeVariableReferenceExpression bindingVar = new CodeVariableReferenceExpression(string.Format("{0}_{1}_{2}", "binding", sourceName, property.Name));
                         CodeTypeReference bindingClassRef = new CodeTypeReference("Binding");
                         CodeVariableDeclarationStatement bindingDecl = new CodeVariableDeclarationStatement(bindingClassRef, bindingVar.VariableName);
-                        bindingDecl.InitExpression = new CodeObjectCreateExpression("Binding", new CodePrimitiveExpression(path.Path));
+
+                        if (path != null)
+                        {
+                            bindingDecl.InitExpression = new CodeObjectCreateExpression("Binding", new CodePrimitiveExpression(path.Path));
+                        }
+                        else
+                        {
+                            bindingDecl.InitExpression = new CodeObjectCreateExpression("Binding");
+                        }
+                        
                         method.Statements.Add(bindingDecl);
 
                         CodeTypeReferenceExpression typeReference = new CodeTypeReferenceExpression(source.GetType().Name);
@@ -639,7 +670,7 @@ namespace EmptyKeys.UserInterface.Generator
                     TemplateBindingExpression templateBinding = entry.Value as TemplateBindingExpression;
                     if (templateBinding != null)
                     {
-                        CodeVariableReferenceExpression bindingVar = new CodeVariableReferenceExpression(string.Format("{0}_{1}_{2}", "binding", source.Name, property.Name));
+                        CodeVariableReferenceExpression bindingVar = new CodeVariableReferenceExpression(string.Format("{0}_{1}_{2}", "binding", sourceName, property.Name));
                         CodeTypeReference bindingClassRef = new CodeTypeReference("Binding");
                         CodeVariableDeclarationStatement bindingDecl = new CodeVariableDeclarationStatement(bindingClassRef, bindingVar.VariableName);
                         bindingDecl.InitExpression = new CodeObjectCreateExpression("Binding", new CodePrimitiveExpression(templateBinding.TemplateBindingExtension.Property.Name));
@@ -771,8 +802,21 @@ namespace EmptyKeys.UserInterface.Generator
                                 method.Statements.Add(setValue);
                             }
                         }
+                        else if (value.GetType().IsEnum)
+                        {
+                            CodeTypeReferenceExpression enumType = new CodeTypeReferenceExpression(value.GetType().Name);      
+                            CodeMethodInvokeExpression setValue = new CodeMethodInvokeExpression(
+                                typeReference, "Set" + property.Name, target,
+                                new CodeFieldReferenceExpression(enumType, value.ToString()));
+                            method.Statements.Add(setValue);
+                        }
                         else
                         {
+                            if (value is double)
+                            {
+                                value = Convert.ToSingle(value);
+                            }
+
                             CodeMethodInvokeExpression setValue = new CodeMethodInvokeExpression(
                                 typeReference, "Set" + property.Name, target,
                                 new CodePrimitiveExpression(value));
@@ -904,32 +948,25 @@ namespace EmptyKeys.UserInterface.Generator
         public static string GenerateTemplate(CodeTypeDeclaration classType, CodeMemberMethod initMethod, DependencyObject content, string templateVariableName)
         {
             CodeMemberMethod initTemplateMethod = new CodeMemberMethod();
+            initTemplateMethod.Attributes = MemberAttributes.Static | MemberAttributes.Private;
             initTemplateMethod.ReturnType = new CodeTypeReference("UIElement");
             initTemplateMethod.Name = templateVariableName + "Method";
             initTemplateMethod.Parameters.Add(new CodeParameterDeclarationExpression("UIElement", "parent"));
             TypeGenerator generator = new TypeGenerator();
             generator.ProcessGenerators(content, classType, initTemplateMethod, false);
-
-            if (initTemplateMethod.Statements.Count < 1)
+            if (initTemplateMethod.Statements.Count < 2)
             {
                 return string.Empty;
             }
 
-            classType.Members.Add(initTemplateMethod);
-
+            classType.Members.Add(initTemplateMethod);            
             CodeVariableDeclarationStatement firstStatement = initTemplateMethod.Statements[1] as CodeVariableDeclarationStatement;
             initTemplateMethod.Statements.Insert(2, new CodeAssignStatement(
                 new CodeFieldReferenceExpression(
                     new CodeVariableReferenceExpression(firstStatement.Name), "Parent"), new CodeVariableReferenceExpression("parent")));
 
-            string creator = templateVariableName + "Func";
-            initMethod.Statements.Add(new CodeSnippetStatement("            Func<UIElement, UIElement> " + creator + " = (parent) => {"));
-
-            CodeMethodReturnStatement returnStatement = new CodeMethodReturnStatement(
-                new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), initTemplateMethod.Name, new CodeVariableReferenceExpression("parent")));
-            initMethod.Statements.Add(returnStatement);
-
-            initMethod.Statements.Add(new CodeSnippetStatement("            };"));
+            string creator = templateVariableName + "Func";            
+            initMethod.Statements.Add(new CodeSnippetStatement(string.Format("            Func<UIElement, UIElement> {0} = {1};", creator, initTemplateMethod.Name)));
 
             CodeMethodReturnStatement returnInitTemplateMethod = new CodeMethodReturnStatement(new CodeVariableReferenceExpression(firstStatement.Name));
             initTemplateMethod.Statements.Add(returnInitTemplateMethod);
@@ -1236,11 +1273,55 @@ namespace EmptyKeys.UserInterface.Generator
                 Color value = (Color)source.GetValue(property);
                 method.Statements.Add(new CodeAssignStatement(
                     new CodeFieldReferenceExpression(target, property.Name),
-                    new CodeObjectCreateExpression("Color",
+                    new CodeObjectCreateExpression("ColorW",
                         new CodePrimitiveExpression(value.R),
                         new CodePrimitiveExpression(value.G),
                         new CodePrimitiveExpression(value.B),
                         new CodePrimitiveExpression(value.A))
+                    ));
+            }
+        }
+
+        /// <summary>
+        /// Generates the rectangle field.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="property">The property.</param>
+        public static void GenerateRectangleField(CodeMemberMethod method, CodeExpression target, RectangleGeometry source, DependencyProperty property)
+        {
+            if (IsValidForFieldGenerator(source.ReadLocalValue(property)))
+            {
+                Rect value = (Rect)source.GetValue(property);
+                method.Statements.Add(new CodeAssignStatement(
+                    new CodeFieldReferenceExpression(target, property.Name),
+                    new CodeObjectCreateExpression("Rect",
+                        new CodePrimitiveExpression(value.X),
+                        new CodePrimitiveExpression(value.Y),
+                        new CodePrimitiveExpression(value.Width),
+                        new CodePrimitiveExpression(value.Height))
+                    ));
+            }
+        }
+
+        /// <summary>
+        /// Generates the point field.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="property">The property.</param>
+        public static void GeneratePointField(CodeMemberMethod method, CodeExpression target, EllipseGeometry source, DependencyProperty property)
+        {
+            if (IsValidForFieldGenerator(source.ReadLocalValue(property)))
+            {
+                Point value = (Point)source.GetValue(property);
+                method.Statements.Add(new CodeAssignStatement(
+                    new CodeFieldReferenceExpression(target, property.Name),
+                    new CodeObjectCreateExpression("PointF",
+                        new CodePrimitiveExpression(value.X),
+                        new CodePrimitiveExpression(value.Y))
                     ));
             }
         }

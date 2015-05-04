@@ -4,36 +4,36 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 
-namespace EmptyKeys.UserInterface.Generator
+namespace EmptyKeys.UserInterface.Designer
 {
     /// <summary>
-    /// Render modes
+    /// Describes actions for Scroll Viewer
     /// </summary>
-    public enum RenderMode
+    public enum ScrollViewerAction
     {
         /// <summary>
-        /// Synapse Gaming Sunburn engine
+        /// The none
         /// </summary>
-        SunBurn,
+        None,
 
         /// <summary>
-        /// MonoGame
+        /// The scroll to bottom
         /// </summary>
-        MonoGame,
+        ScrollToBottom,
 
         /// <summary>
-        /// FNA
+        /// The scroll to top
         /// </summary>
-        FNA,
+        ScrollToTop,
 
         /// <summary>
-        /// Cocos Sharp
+        /// The scroll to left
         /// </summary>
-        CocosSharp,
+        ScrollToLeft,
 
         /// <summary>
-        /// Paradox engine
+        /// The scroll to right
         /// </summary>
-        Paradox
+        ScrollToRight
     }
 }

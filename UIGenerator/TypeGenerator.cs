@@ -8,6 +8,8 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using EmptyKeys.UserInterface.Generator.Types;
+using EmptyKeys.UserInterface.Generator.Types.Controls;
+using EmptyKeys.UserInterface.Generator.Types.Shapes;
 
 namespace EmptyKeys.UserInterface.Generator
 {
@@ -142,6 +144,24 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType animImage = new AnimatedImageGeneratorType();
             Generators.Add(animImage.XamlType, animImage);
+
+            IGeneratorType shape = new ShapeGeneratorType();
+            Generators.Add(shape.XamlType, shape);
+
+            IGeneratorType rectangle = new RectangleGeneratorType();
+            Generators.Add(rectangle.XamlType, rectangle);
+
+            IGeneratorType ellipse = new EllipseGeneratorType();
+            Generators.Add(ellipse.XamlType, ellipse);
+
+            IGeneratorType canvas = new CanvasGeneratorType();
+            Generators.Add(canvas.XamlType, canvas);
+
+            IGeneratorType path = new PathGeneratorType();
+            Generators.Add(path.XamlType, path);
+
+            IGeneratorType dockPanel = new DockPanelGeneratorType();
+            Generators.Add(dockPanel.XamlType, dockPanel);
         }
 
         /// <summary>
@@ -179,7 +199,7 @@ namespace EmptyKeys.UserInterface.Generator
                     FrameworkElement elem = source as FrameworkElement;
                     if (elem != null)
                     {
-                        CodeComHelper.GenerateBindings(method, parent, elem);
+                        CodeComHelper.GenerateBindings(method, parent, elem, elem.Name);
                         CodeComHelper.GenerateResourceReferences(method, parent, elem);
 
                         if (elem.Resources.Count != 0 || elem.Resources.MergedDictionaries.Count != 0)
@@ -187,14 +207,14 @@ namespace EmptyKeys.UserInterface.Generator
                             ResourceDictionaryGenerator resourcesGenerator = new ResourceDictionaryGenerator();
 
                             CodeMemberMethod resourcesMethod = new CodeMemberMethod();
+                            resourcesMethod.Attributes = MemberAttributes.Static | MemberAttributes.Private;
                             resourcesMethod.Name = "InitializeElement" + elem.Name + "Resources";
                             resourcesMethod.Parameters.Add(new CodeParameterDeclarationExpression("UIElement", "elem"));
                             classType.Members.Add(resourcesMethod);
                             resourcesGenerator.Generate(elem.Resources, classType, resourcesMethod, 
                                 new CodeFieldReferenceExpression(new CodeVariableReferenceExpression("elem"), "Resources"));
 
-                            method.Statements.Add(new CodeMethodInvokeExpression(
-                                new CodeThisReferenceExpression(), resourcesMethod.Name, parent));
+                            method.Statements.Add(new CodeMethodInvokeExpression(null,resourcesMethod.Name, parent));
                         }
                     }
 

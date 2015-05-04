@@ -73,7 +73,8 @@ namespace EmptyKeys.UserInterface.Generator
         /// Generates the font assets.
         /// </summary>
         /// <param name="path">The path.</param>
-        public void GenerateFontAssets(string path)
+        /// <param name="renderMode">The render mode.</param>
+        public void GenerateFontAssets(string path, RenderMode renderMode)
         {
             if (fonts.Count == 0)
             {
@@ -82,6 +83,11 @@ namespace EmptyKeys.UserInterface.Generator
 
             Console.WriteLine("Generating Fonts...");
             string templatePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SpriteFontTemplate.xml");
+            if (renderMode == RenderMode.Paradox)
+            {
+                templatePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SpriteFontTemplate.pdxfnt");
+            }
+
             string template = File.OpenText(templatePath).ReadToEnd();
             foreach (var info in fonts.Values)
             {
@@ -90,8 +96,21 @@ namespace EmptyKeys.UserInterface.Generator
                 string fontStyle = GetFontStyle(info);
 
                 string assetName = GetFontAssetName(fontName, fontSize, fontStyle);
-                string fileContent = string.Format(template, fontName, fontSize.ToString(CultureInfo.InvariantCulture), fontStyle);
-                string fullPath = Path.Combine(path, assetName) + ".spritefont";
+
+                string fileContent = string.Empty;
+                string extension = ".spritefont";
+                if (renderMode == RenderMode.Paradox)
+                {
+                    string assetGuid = Guid.NewGuid().ToString();
+                    fileContent = string.Format(template, fontName, fontSize.ToString(CultureInfo.InvariantCulture), fontStyle, assetGuid);
+                    extension = ".pdxfnt";
+                }
+                else
+                {
+                    fileContent = string.Format(template, fontName, fontSize.ToString(CultureInfo.InvariantCulture), fontStyle);
+                }
+
+                string fullPath = Path.Combine(path, assetName) + extension;
 
                 using (StreamWriter outfile = new StreamWriter(fullPath, false, Encoding.UTF8))
                 {

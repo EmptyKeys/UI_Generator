@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -20,6 +21,25 @@ namespace EmptyKeys.UserInterface.Designer
     /// </summary>
     public class UIRoot : ContentControl
     {
+        /// <summary>
+        /// The owned windows content property
+        /// </summary>
+        public static readonly DependencyProperty OwnedWindowsContentProperty =
+            DependencyProperty.Register("OwnedWindowsContent", typeof(IEnumerable), typeof(UIRoot),
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.AffectsMeasure));
+
+        /// <summary>
+        /// Gets or sets the content of the owned windows.
+        /// </summary>
+        /// <value>
+        /// The content of the owned windows.
+        /// </value>
+        public IEnumerable OwnedWindowsContent
+        {
+            get { return (IEnumerable)GetValue(OwnedWindowsContentProperty); }
+            set { SetValue(OwnedWindowsContentProperty, value); }
+        }
+
         /// <summary>
         /// Initializes the <see cref="UIRoot"/> class.
         /// </summary>

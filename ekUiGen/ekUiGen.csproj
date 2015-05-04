@@ -53,6 +53,9 @@
   <ItemGroup>
     <None Include="App.config" />
     <None Include="packages.config" />
+    <Content Include="SpriteFontTemplate.pdxfnt">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EmptyKeys.UserInterface.Designer\EmptyKeys.UserInterface.Designer.csproj">

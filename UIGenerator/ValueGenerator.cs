@@ -114,6 +114,13 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorValue thicknessAnim = new ThicknessAnimationGeneratorValue();
             Generators.Add(thicknessAnim.ValueType, thicknessAnim);
+
+            IGeneratorValue rectangle = new RectangleGeometryGeneratorValue();
+            Generators.Add(rectangle.ValueType, rectangle);
+
+            IGeneratorValue ellipse = new EllipseGeometryGeneratorValue();
+            Generators.Add(ellipse.ValueType, ellipse);
+            
         }
 
         /// <summary>
@@ -126,7 +133,12 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="dictionary">The dictionary.</param>
         /// <returns></returns>
         public CodeExpression ProcessGenerators(CodeTypeDeclaration parentClass, CodeMemberMethod method, object value, string baseName, ResourceDictionary dictionary = null)
-        {
+        {            
+            if (value == null)
+            {
+                return new CodePrimitiveExpression(null);
+            }
+
             IGeneratorValue generator;
             Type valueType = value.GetType();
             CodeExpression valueExpression = null;

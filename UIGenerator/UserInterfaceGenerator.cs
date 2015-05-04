@@ -70,11 +70,15 @@ namespace EmptyKeys.UserInterface.Generator
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Data"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls.Primitives"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Input"));            
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Animation"));            
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Imaging"));            
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Animation"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Imaging"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Shapes"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Renderers"));            
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));            
 
+            /*
             switch (renderMode)
             {
                 case RenderMode.SunBurn:
@@ -87,6 +91,7 @@ namespace EmptyKeys.UserInterface.Generator
                 default:
                     break;
             }
+             */ 
 
             CodeTypeDeclaration classType = new CodeTypeDeclaration(className);
 
@@ -257,6 +262,7 @@ namespace EmptyKeys.UserInterface.Generator
             constructor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("width"));
             constructor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("height"));
 
+            /*
             if (renderMode == RenderMode.MonoGame)
             {
                 constructor.Parameters.Add(new CodeParameterDeclarationExpression("GraphicsDevice", "graphicsDevice"));
@@ -267,6 +273,7 @@ namespace EmptyKeys.UserInterface.Generator
                 constructor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("nativeScreenWidth"));
                 constructor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("nativeScreenHeight"));
             }
+            */
 
             constructor.Statements.Add(new CodeVariableDeclarationStatement("Style", "style",
                     new CodeMethodInvokeExpression(new CodeTypeReferenceExpression("RootStyle"), "CreateRootStyle")));

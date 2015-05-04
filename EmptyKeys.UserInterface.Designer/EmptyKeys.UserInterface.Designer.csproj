@@ -74,6 +74,8 @@
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
     </Compile>
     <Compile Include="RoutedEvents.cs" />
+    <Compile Include="ScrollViewerAction.cs" />
+    <Compile Include="ScrollViewerHelper.cs" />
     <Compile Include="SolidColorBrushAnimation.cs" />
     <Compile Include="SoundManager.cs" />
     <Compile Include="SoundSource.cs" />

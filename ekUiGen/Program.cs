@@ -48,7 +48,7 @@ namespace ekUiGen
                 return 0;
             }
             
-            if (args.Length < 4)
+            if (args.Length < 3)
             {
                 Console.WriteLine("ERROR: Some argument is missing.");
                 ShowHelp(optionSet);
@@ -101,8 +101,8 @@ namespace ekUiGen
                     return -2;
                 }
             }
-            
-            FontGenerator.Instance.GenerateFontAssets(assetsDirectory);            
+
+            FontGenerator.Instance.GenerateFontAssets(assetsDirectory, renderMode);
             bool result = ImageAssets.Instance.CopyImagesToAssetDirectory(assetsDirectory);
             if (!result)
             {
