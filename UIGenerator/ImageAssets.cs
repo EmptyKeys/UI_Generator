@@ -48,15 +48,25 @@ namespace EmptyKeys.UserInterface.Generator
         }
 
         /// <summary>
-        /// Copies the images to asset directory.
+        /// Copies the images from the current working directory to the specified asset target directory.
         /// </summary>
-        /// <param name="assetsDirectory">The assets directory.</param>
-        public bool CopyImagesToAssetDirectory(string assetsDirectory)
+        /// <param name="TargetDir">The assets directory.</param>
+        public bool CopyImagesToAssetDirectory(string TargetDir)
+        {
+            string SourceDir = Path.GetDirectoryName(Environment.CurrentDirectory);
+            return CopyImagesToAssetDirectory(TargetDir, SourceDir);
+        }
+
+        /// <summary>
+        /// Copies the images from the specified source directory to the specified asset target directory.
+        /// </summary>
+        /// <param name="TargetDir">The assets directory.</param>
+        public bool CopyImagesToAssetDirectory(string TargetDir, string SourceDir)
         {
             foreach (string asset in imageAssets)
             {
-                string source = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), asset);
-                string target = Path.Combine(assetsDirectory, asset);
+                string sourceFile = Path.Combine(SourceDir, asset);
+                string target = Path.Combine(TargetDir, asset);
 
                 try
                 {
@@ -65,7 +75,7 @@ namespace EmptyKeys.UserInterface.Generator
                         Directory.CreateDirectory(Path.GetDirectoryName(target));
                     }
 
-                    File.Copy(source, target, true);
+                    File.Copy(sourceFile, target, true);
                 }
                 catch (Exception ex)
                 {
