@@ -61,6 +61,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// Copies the images from the specified source directory to the specified asset target directory.
         /// </summary>
         /// <param name="TargetDir">The assets directory.</param>
+        /// <param name="SourceDir">The directory to copy assets from.</param>
         public bool CopyImagesToAssetDirectory(string TargetDir, string SourceDir)
         {
             foreach (string asset in imageAssets)
