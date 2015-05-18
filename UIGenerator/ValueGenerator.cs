@@ -120,7 +120,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorValue ellipse = new EllipseGeometryGeneratorValue();
             Generators.Add(ellipse.ValueType, ellipse);
-            
+
+            IGeneratorValue line = new LineGeometryGeneratorValue();
+            Generators.Add(line.ValueType, line);
         }
 
         /// <summary>

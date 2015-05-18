@@ -162,6 +162,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType dockPanel = new DockPanelGeneratorType();
             Generators.Add(dockPanel.XamlType, dockPanel);
+
+            IGeneratorType line = new LineGeneratorType();
+            Generators.Add(line.XamlType, line);
         }
 
         /// <summary>

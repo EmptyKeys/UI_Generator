@@ -50,6 +50,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
                 TypeGenerator itemGenerator = new TypeGenerator();
 
                 CodeMemberMethod itemsMethod = new CodeMemberMethod();
+                itemsMethod.Attributes = MemberAttributes.Static | MemberAttributes.Private;
                 itemsMethod.Name = "Get_" + itemsControl.Name + "_Items";
                 itemsMethod.ReturnType = new CodeTypeReference(typeof(ObservableCollection<object>));
                 classType.Members.Add(itemsMethod);
@@ -74,7 +75,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
 
                 method.Statements.Add(new CodeAssignStatement(
                     new CodeFieldReferenceExpression(fieldReference, "ItemsSource"),
-                    new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), itemsMethod.Name)));
+                    new CodeMethodInvokeExpression(null, itemsMethod.Name)));
             }
 
             return fieldReference;

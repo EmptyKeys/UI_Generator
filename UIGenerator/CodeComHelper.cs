@@ -665,6 +665,11 @@ namespace EmptyKeys.UserInterface.Generator
                                 method.Statements.Add(warning);
                             }
                         }
+
+                        if (!string.IsNullOrEmpty(commandBindingExpr.ParentBinding.StringFormat))
+                        {
+                            GenerateField(method, bindingVar, "StringFormat", commandBindingExpr.ParentBinding.StringFormat);
+                        }
                     }
 
                     TemplateBindingExpression templateBinding = entry.Value as TemplateBindingExpression;
@@ -1312,7 +1317,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="target">The target.</param>
         /// <param name="source">The source.</param>
         /// <param name="property">The property.</param>
-        public static void GeneratePointField(CodeMemberMethod method, CodeExpression target, EllipseGeometry source, DependencyProperty property)
+        public static void GeneratePointField(CodeMemberMethod method, CodeExpression target, Geometry source, DependencyProperty property)
         {
             if (IsValidForFieldGenerator(source.ReadLocalValue(property)))
             {

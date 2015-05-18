@@ -67,6 +67,7 @@
     <Compile Include="Types\AnimatedImageGeneratorType.cs" />
     <Compile Include="Types\NumericTextBoxGeneratorType.cs" />
     <Compile Include="Types\PasswordBoxGeneratorType.cs" />
+    <Compile Include="Types\Shapes\LineGeneratorType.cs" />
     <Compile Include="Types\Shapes\PathGeneratorType.cs" />
     <Compile Include="Types\Shapes\EllipseGeneratorType.cs" />
     <Compile Include="Types\Shapes\RectangleGeneratorType.cs" />
@@ -114,6 +115,7 @@
     <Compile Include="Values\BrushGeneratorValue.cs" />
     <Compile Include="Values\DoubleAnimationGeneratorValue.cs" />
     <Compile Include="Values\EllipseGeometryGeneratorValue.cs" />
+    <Compile Include="Values\LineGeometryGeneratorValue.cs" />
     <Compile Include="Values\RectangleGeometryGeneratorValue.cs" />
     <Compile Include="Values\SolidColorBrushAnimGeneratorValue.cs" />
     <Compile Include="Values\ThicknessAnimationGeneratorValue.cs" />
