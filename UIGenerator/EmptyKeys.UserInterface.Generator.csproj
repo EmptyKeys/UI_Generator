@@ -113,6 +113,7 @@
     <Compile Include="ValueGenerator.cs" />
     <Compile Include="Values\BitmapImageGeneratorValue.cs" />
     <Compile Include="Values\BrushGeneratorValue.cs" />
+    <Compile Include="Values\ColorGeneratorValue.cs" />
     <Compile Include="Values\DoubleAnimationGeneratorValue.cs" />
     <Compile Include="Values\EllipseGeometryGeneratorValue.cs" />
     <Compile Include="Values\LineGeometryGeneratorValue.cs" />

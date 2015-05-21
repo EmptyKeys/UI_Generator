@@ -109,14 +109,14 @@ namespace EmptyKeys.UserInterface.Generator.Types
             }
 
             if (element.InputBindings.Count > 0)
-            {                
-                GenerateInputBindings(method, element);
+            {
+                GenerateInputBindings(method, element, fieldReference);
             }
 
             return fieldReference;
         }
 
-        private static void GenerateInputBindings(CodeMemberMethod method, FrameworkElement element)
+        private static void GenerateInputBindings(CodeMemberMethod method, FrameworkElement element, CodeExpression fieldReference)
         {
             for (int i = 0; i < element.InputBindings.Count; i++)
             {
@@ -164,7 +164,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
                 {
                     DependencyObject depObject = element.InputBindings[i] as DependencyObject;                    
                     CodeComHelper.GenerateField<object>(method, bindingVarRef, depObject, InputBinding.CommandParameterProperty);
-                    CodeComHelper.GenerateBindings(method, bindingVarRef, depObject, bindingVarName);
+                    CodeComHelper.GenerateBindings(method, bindingVarRef, depObject, bindingVarName, fieldReference, true);
 
                     method.Statements.Add(new CodeMethodInvokeExpression(
                         new CodeVariableReferenceExpression(element.Name), "InputBindings.Add", new CodeVariableReferenceExpression(bindingVarName)));

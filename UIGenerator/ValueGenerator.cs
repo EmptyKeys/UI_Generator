@@ -123,6 +123,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorValue line = new LineGeometryGeneratorValue();
             Generators.Add(line.ValueType, line);
+
+            IGeneratorValue color = new ColorGeneratorValue();
+            Generators.Add(color.ValueType, color);
         }
 
         /// <summary>

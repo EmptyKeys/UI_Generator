@@ -611,7 +611,9 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="target">The target.</param>
         /// <param name="source">The source.</param>
         /// <param name="sourceName">Name of the source.</param>
-        public static void GenerateBindings(CodeMemberMethod method, CodeExpression target, DependencyObject source, string sourceName)
+        /// <param name="bindingSource">The binding source.</param>
+        /// <param name="setBindingSource">if set to <c>true</c> [set binding source].</param>
+        public static void GenerateBindings(CodeMemberMethod method, CodeExpression target, DependencyObject source, string sourceName, CodeExpression bindingSource = null, bool setBindingSource = false)
         {
             LocalValueEnumerator enumerator = source.GetLocalValueEnumerator();
             while (enumerator.MoveNext())
@@ -640,15 +642,10 @@ namespace EmptyKeys.UserInterface.Generator
                         
                         method.Statements.Add(bindingDecl);
 
-                        CodeTypeReferenceExpression typeReference = new CodeTypeReferenceExpression(source.GetType().Name);
-                        CodeMethodInvokeExpression setBinding = new CodeMethodInvokeExpression(
-                            target, "SetBinding", new CodeFieldReferenceExpression(typeReference, property.Name + "Property"), bindingVar);
-                        method.Statements.Add(setBinding);
-
                         if (commandBindingExpr.ParentBinding.Mode != BindingMode.Default)
                         {
                             GenerateEnumField(method, bindingVar, "Mode", "BindingMode", commandBindingExpr.ParentBinding.Mode.ToString());
-                        }
+                        }                        
 
                         if (commandBindingExpr.ParentBinding.FallbackValue != DependencyProperty.UnsetValue)
                         {
@@ -670,6 +667,18 @@ namespace EmptyKeys.UserInterface.Generator
                         {
                             GenerateField(method, bindingVar, "StringFormat", commandBindingExpr.ParentBinding.StringFormat);
                         }
+
+                        if (setBindingSource && bindingSource != null)
+                        {
+                            var sourceStatement = new CodeAssignStatement(
+                                new CodeFieldReferenceExpression(bindingVar, "Source"), new CodeFieldReferenceExpression(bindingSource, "DataContext"));
+                            method.Statements.Add(sourceStatement);
+                        }
+
+                        CodeTypeReferenceExpression typeReference = new CodeTypeReferenceExpression(source.GetType().Name);
+                        CodeMethodInvokeExpression setBinding = new CodeMethodInvokeExpression(
+                            target, "SetBinding", new CodeFieldReferenceExpression(typeReference, property.Name + "Property"), bindingVar);
+                        method.Statements.Add(setBinding);                        
                     }
 
                     TemplateBindingExpression templateBinding = entry.Value as TemplateBindingExpression;
