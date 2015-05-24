@@ -41,21 +41,6 @@ namespace EmptyKeys.UserInterface.Designer
         }
 
         /// <summary>
-        /// The Namespace Property
-        /// </summary>
-        public static readonly DependencyProperty NamespaceProperty = 
-            DependencyProperty.Register("Namespace", typeof(string), typeof(UIRoot));
-
-        /// <summary>
-        /// Gets or sets the namespace to generate the code under.
-        /// </summary>
-        public string Namespace
-        {
-            get { return (string)GetValue(NamespaceProperty); }
-            set { SetValue(NamespaceProperty, value); }
-        }
-
-        /// <summary>
         /// Initializes the <see cref="UIRoot"/> class.
         /// </summary>
         static UIRoot()

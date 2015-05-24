@@ -36,7 +36,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="inputFileContent">Content of the input file.</param>
         /// <param name="renderMode">The render mode.</param>
         /// <returns></returns>
-        public string GenerateCode(string inputFileName, string inputFileContent, RenderMode renderMode)
+        public string GenerateCode(string inputFileName, string inputFileContent, RenderMode renderMode, string desiredNamespace)
         {
             inputFileContent = RemoveClass(inputFileContent);
 
@@ -56,21 +56,13 @@ namespace EmptyKeys.UserInterface.Generator
                 return "Source is empty. XAML file is not valid.";
             }
 
-            string desiredNamespace = null;
-            //Try to find the namespace if it's a UIRoot
-            if (source is UIRoot)
-            {
-                desiredNamespace = ((UIRoot)source).Namespace;
-                if (desiredNamespace == "") desiredNamespace = null;
-            }
-
             Console.WriteLine();
             Console.WriteLine("Generating " + inputFileName);
 
             string resultCode = string.Empty;
             string className = Path.GetFileNameWithoutExtension(inputFileName);
 
-            CodeNamespace ns = new CodeNamespace(desiredNamespace == null ? "EmptyKeys.UserInterface.Generated" : desiredNamespace);
+            CodeNamespace ns = new CodeNamespace(desiredNamespace);
             ns.Imports.Add(new CodeNamespaceImport("System"));
             ns.Imports.Add(new CodeNamespaceImport("System.CodeDom.Compiler"));
             ns.Imports.Add(new CodeNamespaceImport("System.Collections.ObjectModel"));
