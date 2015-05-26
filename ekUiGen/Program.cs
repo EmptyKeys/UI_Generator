@@ -21,7 +21,7 @@ namespace ekUiGen
             string inputDirectory = string.Empty;
             string outputDirectory = string.Empty;
             string assetsDirectory = string.Empty;
-            string desiredNamespace = "EmptyKeys.UserInterace.Generated";
+            string desiredNamespace = "EmptyKeys.UserInterface.Generated";
             RenderMode renderMode = RenderMode.SunBurn;
 
             var optionSet = new OptionSet()
