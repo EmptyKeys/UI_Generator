@@ -18,17 +18,24 @@ namespace ekUiGen
             Console.WriteLine("Empty Keys (c) 2014 User Interface Generator Console v" + Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             bool showHelp = false;
+            bool IgnoreImageAssets = false;
+            bool IgnoreFontAssets = false;
             string inputDirectory = string.Empty;
             string outputDirectory = string.Empty;
-            string assetsDirectory = string.Empty;
+            string assetOutputDirectory = string.Empty;
+            string assetInputDirectory = string.Empty;
             RenderMode renderMode = RenderMode.SunBurn;
 
             var optionSet = new OptionSet()
                 .Add("?|help|h", "Command line help", o => showHelp = o != null)
                 .Add<string>("i|input=", "Input directory with XAML files", o => inputDirectory = o)
                 .Add<string>("o|output=", "Output directory for .cs files", o => outputDirectory = o)
-                .Add<string>("oa=", "Output Asset directory for generated sprite fonts and images", o => assetsDirectory = o)
-                .Add<RenderMode>("rm=", "Render mode (SunBurn/MonoGame)", o => renderMode = o);
+                .Add("no-copy-images", "Do not copy generated image assets (ignores input asset directory)", o => IgnoreImageAssets = o != null)
+                .Add("no-fonts", "Do not generate font assets (may lead to broken output)", o => IgnoreFontAssets = o != null)
+                .Add("ignore-assets", "Ignore all asset files and just generate .xaml.cs files", o => IgnoreImageAssets = IgnoreFontAssets = o != null)
+                .Add<string>("ia=", "Input asset directory to copy images from", o => assetInputDirectory = o)
+                .Add<string>("oa=", "Output Asset directory for generated sprite fonts and images", o => assetOutputDirectory = o)
+                .Add<RenderMode>("render|rendermode|rm=", "Render mode (SunBurn/MonoGame)", o => renderMode = o);
                 
             try
             {
@@ -47,44 +54,48 @@ namespace ekUiGen
                 ShowHelp(optionSet);
                 return 0;
             }
-            
-            if (args.Length < 3)
-            {
-                Console.WriteLine("ERROR: Some argument is missing.");
-                ShowHelp(optionSet);
-                return -1;
-            }
                         
-            if (string.IsNullOrEmpty(inputDirectory) || !Directory.Exists(inputDirectory))
+            if (string.IsNullOrEmpty(inputDirectory))
             {
-                Console.WriteLine("ERROR: Input directory does not exist.");
+                Console.WriteLine("ERROR: You must specify an input directory.");
                 ShowHelp(optionSet);
                 return -1;
             }
-            
+
+            if (!Directory.Exists(inputDirectory))
+            {
+                Console.WriteLine("ERROR: The specified input directory does not exist: " + inputDirectory);
+                ShowHelp(optionSet);
+                return -1;
+            }
+
             if (string.IsNullOrEmpty(outputDirectory))
             {
-                Console.WriteLine("ERROR: Empty output directory argument.");
+                Console.WriteLine("ERROR: You must specify a code output directory.");
                 ShowHelp(optionSet);
                 return -1;
             }
             
-            if (string.IsNullOrEmpty(assetsDirectory))
-            {
-                Console.WriteLine("ERROR: Empty assets directory argument.");
-                ShowHelp(optionSet);
-                return -1;
-            }                        
+            if (!(IgnoreFontAssets && IgnoreImageAssets) && string.IsNullOrEmpty(assetOutputDirectory))
+                Console.WriteLine("WARNING: No asset output directory specified. No image or font files will be created (specify --ignore-assets if this was intentional).");
 
             if (!Directory.Exists(outputDirectory))
             {
                 Directory.CreateDirectory(outputDirectory);
             }
 
-            if (!Directory.Exists(assetsDirectory))
+            if (!(IgnoreFontAssets && IgnoreImageAssets) && !string.IsNullOrEmpty(assetOutputDirectory) && !Directory.Exists(assetOutputDirectory))
             {
-                Directory.CreateDirectory(assetsDirectory);
-            }            
+                try
+                {
+                    Directory.CreateDirectory(assetOutputDirectory);
+                }
+                catch(Exception e)
+                {
+                    Console.WriteLine("Error creating asset output directory: " + e.Message);
+                    return -1;
+                }
+            }
 
             foreach (var file in Directory.EnumerateFiles(inputDirectory, "*.xaml", SearchOption.AllDirectories))
             {
@@ -101,13 +112,21 @@ namespace ekUiGen
                     return -2;
                 }
             }
+            
+            if(!IgnoreFontAssets && !string.IsNullOrEmpty(assetOutputDirectory))
+                FontGenerator.Instance.GenerateFontAssets(assetOutputDirectory, renderMode);
 
-            FontGenerator.Instance.GenerateFontAssets(assetsDirectory, renderMode);
-            bool result = ImageAssets.Instance.CopyImagesToAssetDirectory(assetsDirectory);
-            if (!result)
+            if (!IgnoreImageAssets)
             {
-                return -3;
-            }            
+                bool result;
+                if(assetInputDirectory.Length > 0)
+                    result = ImageAssets.Instance.CopyImagesToAssetDirectory(assetOutputDirectory, assetInputDirectory);
+                else
+                    result = ImageAssets.Instance.CopyImagesToAssetDirectory(assetOutputDirectory);
+
+                if (!result)
+                    return -3;
+            }
 
             return 0;
         }
