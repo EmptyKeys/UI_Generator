@@ -75,9 +75,11 @@ namespace ekUiGen
                 ShowHelp(optionSet);
                 return -1;
             }
-            
+
             if (!(IgnoreFontAssets && IgnoreImageAssets) && string.IsNullOrEmpty(assetOutputDirectory))
+            {
                 Console.WriteLine("WARNING: No asset output directory specified. No image or font files will be created (specify --ignore-assets if this was intentional).");
+            }
 
             if (!Directory.Exists(outputDirectory))
             {
@@ -112,20 +114,28 @@ namespace ekUiGen
                     return -2;
                 }
             }
-            
-            if(!IgnoreFontAssets && !string.IsNullOrEmpty(assetOutputDirectory))
+
+            if (!IgnoreFontAssets && !string.IsNullOrEmpty(assetOutputDirectory))
+            {
                 FontGenerator.Instance.GenerateFontAssets(assetOutputDirectory, renderMode);
+            }
 
             if (!IgnoreImageAssets)
             {
                 bool result;
-                if(assetInputDirectory.Length > 0)
+                if (!string.IsNullOrWhiteSpace(assetInputDirectory))
+                {
                     result = ImageAssets.Instance.CopyImagesToAssetDirectory(assetOutputDirectory, assetInputDirectory);
+                }
                 else
+                {
                     result = ImageAssets.Instance.CopyImagesToAssetDirectory(assetOutputDirectory);
+                }
 
                 if (!result)
+                {
                     return -3;
+                }
             }
 
             return 0;
