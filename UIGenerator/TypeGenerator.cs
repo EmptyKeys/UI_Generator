@@ -49,6 +49,9 @@ namespace EmptyKeys.UserInterface.Generator
             IGeneratorType border = new BorderGeneratorType();
             Generators.Add(border.XamlType, border);
 
+            IGeneratorType label = new LabelGeneratorType();
+            Generators.Add(label.XamlType, label);
+
             IGeneratorType button = new ButtonGeneratorType();
             Generators.Add(button.XamlType, button);
 
