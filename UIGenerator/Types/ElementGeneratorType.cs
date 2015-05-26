@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using EmptyKeys.UserInterface.Designer.Input;
 
 namespace EmptyKeys.UserInterface.Generator.Types
 {
@@ -157,6 +158,23 @@ namespace EmptyKeys.UserInterface.Generator.Types
                                 new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(ModifierKeys).Name), keyGesture.Modifiers.ToString()),
                                 new CodePrimitiveExpression(keyGesture.DisplayString)
                                 )));
+                    }
+                }
+
+                GamepadBinding gamepadBinding = element.InputBindings[i] as GamepadBinding;
+                if (gamepadBinding != null)
+                {
+                    bindingVar = new CodeVariableDeclarationStatement("GamepadBinding", bindingVarName, new CodeObjectCreateExpression("GamepadBinding"));
+                    method.Statements.Add(bindingVar);
+
+                    GamepadGesture gesture = gamepadBinding.Gesture as GamepadGesture;
+                    if (gesture != null)
+                    {
+                        method.Statements.Add(new CodeAssignStatement(
+                            new CodeFieldReferenceExpression(bindingVarRef, "Gesture"),
+                            new CodeObjectCreateExpression("GamepadGesture",
+                                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeof(GamepadInput).Name), gesture.GamepadInput.ToString()))
+                                ));
                     }
                 }
 

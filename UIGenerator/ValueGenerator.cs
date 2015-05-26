@@ -126,6 +126,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorValue color = new ColorGeneratorValue();
             Generators.Add(color.ValueType, color);
+
+            IGeneratorValue fontFamily = new FontFamilyGeneratorValue();
+            Generators.Add(fontFamily.ValueType, fontFamily);
         }
 
         /// <summary>

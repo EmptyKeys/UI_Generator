@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using EmptyKeys.UserInterface.Generator.Types.Controls;
 
 namespace EmptyKeys.UserInterface.Generator.Types
 {
@@ -35,7 +36,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
         /// <param name="source">The dependence object</param>
         /// <param name="classType">Type of the class.</param>
         /// <param name="initMethod">The initialize method.</param>
-        /// <param name="generateField"></param>
+        /// <param name="generateField">if set to <c>true</c> [generate field].</param>
         /// <returns></returns>
         public override CodeExpression Generate(DependencyObject source, CodeTypeDeclaration classType, CodeMemberMethod initMethod, bool generateField)
         {
@@ -46,6 +47,23 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateField<bool>(initMethod, fieldReference, source, DataGrid.AutoGenerateColumnsProperty);
             CodeComHelper.GenerateEnumField<ScrollBarVisibility>(initMethod, fieldReference, source, DataGrid.HorizontalScrollBarVisibilityProperty);
             CodeComHelper.GenerateEnumField<ScrollBarVisibility>(initMethod, fieldReference, source, DataGrid.VerticalScrollBarVisibilityProperty);
+
+            if (grid.Columns.Count > 0)
+            {
+                TypeGenerator colGenerator = new TypeGenerator();
+                for (int i = 0; i < grid.Columns.Count; i++)
+                {
+                    var column = grid.Columns[i];
+                    DataGridColumnGeneratorType.ColumnName = grid.Name + "_Col" + i;
+                    CodeExpression expr = colGenerator.ProcessGenerators(column, classType, initMethod, false);
+                    if (expr == null)
+                    {
+                        continue;
+                    }
+
+                    initMethod.Statements.Add(new CodeMethodInvokeExpression(fieldReference, "Columns.Add", expr));
+                }                
+            }
 
             return fieldReference;
         }

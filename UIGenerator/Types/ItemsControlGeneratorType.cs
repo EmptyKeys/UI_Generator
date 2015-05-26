@@ -47,7 +47,8 @@ namespace EmptyKeys.UserInterface.Generator.Types
 
             if (itemsControl.Items.Count > 0)
             {
-                TypeGenerator itemGenerator = new TypeGenerator();
+                TypeGenerator typeGenerator = new TypeGenerator();
+                ValueGenerator valueGenerator = new ValueGenerator();
 
                 CodeMemberMethod itemsMethod = new CodeMemberMethod();
                 itemsMethod.Attributes = MemberAttributes.Static | MemberAttributes.Private;
@@ -58,15 +59,29 @@ namespace EmptyKeys.UserInterface.Generator.Types
                 CodeVariableDeclarationStatement collection = new CodeVariableDeclarationStatement(
                     typeof(ObservableCollection<object>), "items", new CodeObjectCreateExpression(typeof(ObservableCollection<object>)));
                 itemsMethod.Statements.Add(collection);
+
                 CodeVariableReferenceExpression itemsVar = new CodeVariableReferenceExpression("items");
                 foreach (var item in itemsControl.Items)
                 {
-                    CodeExpression itemExpr = itemGenerator.ProcessGenerators(item, classType, itemsMethod, false);
+                    Type itemType = item.GetType();
+                    CodeExpression itemExpr = null;
+                    if (typeGenerator.HasGenerator(itemType))
+                    {
+                        itemExpr = typeGenerator.ProcessGenerators(item, classType, itemsMethod, false);
+                    }
+                    else
+                    {
+                        itemExpr = valueGenerator.ProcessGenerators(classType, itemsMethod, item, itemsControl.Name);
+                    }
 
                     if (itemExpr != null)
                     {
                         CodeMethodInvokeExpression addItem = new CodeMethodInvokeExpression(itemsVar, "Add", itemExpr);
                         itemsMethod.Statements.Add(addItem);
+                    }
+                    else
+                    {
+                        CodeComHelper.GenerateError(itemsMethod, string.Format("Type {0} in Items Control collection not supported", itemType.Name));
                     }
                 }
 

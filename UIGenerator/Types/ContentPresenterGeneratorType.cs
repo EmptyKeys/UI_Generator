@@ -79,7 +79,8 @@ namespace EmptyKeys.UserInterface.Generator.Types
                 // TODO content can be another class, so this will not work
             }
                      
-            CodeComHelper.GenerateField<string>(initMethod, fieldReference, presenter, ContentPresenter.ContentStringFormatProperty);            
+            CodeComHelper.GenerateField<string>(initMethod, fieldReference, presenter, ContentPresenter.ContentStringFormatProperty);
+            CodeComHelper.GenerateTemplateStyleField(classType, initMethod, fieldReference, source, ContentPresenter.ContentTemplateProperty);
 
             return fieldReference;
         }

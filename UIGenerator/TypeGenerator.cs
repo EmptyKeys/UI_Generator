@@ -76,6 +76,21 @@ namespace EmptyKeys.UserInterface.Generator
             IGeneratorType dataGrid = new DataGridGeneratorType();
             Generators.Add(dataGrid.XamlType, dataGrid);
 
+            IGeneratorType dataGridColumn = new DataGridColumnGeneratorType();
+            Generators.Add(dataGridColumn.XamlType, dataGridColumn);
+
+            IGeneratorType dataGridBoundColumn = new DataGridBoundColumnGeneratorType();
+            Generators.Add(dataGridBoundColumn.XamlType, dataGridBoundColumn);
+
+            IGeneratorType dataGridTextColumn = new DataGridTextColumnGeneratorType();
+            Generators.Add(dataGridTextColumn.XamlType, dataGridTextColumn);
+
+            IGeneratorType dataGridCheckBoxColumn = new DataGridCheckBoxColumnGeneratorType();
+            Generators.Add(dataGridCheckBoxColumn.XamlType, dataGridCheckBoxColumn);
+
+            IGeneratorType dataGridTemplateColumn = new DataGridTemplateColumnGeneratorType();
+            Generators.Add(dataGridTemplateColumn.XamlType, dataGridTemplateColumn);
+
             IGeneratorType expander = new ExpanderGeneratorType();
             Generators.Add(expander.XamlType, expander);
 
@@ -165,6 +180,25 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType line = new LineGeneratorType();
             Generators.Add(line.XamlType, line);
+
+            IGeneratorType treeView = new TreeViewGeneratorType();
+            Generators.Add(treeView.XamlType, treeView);
+
+            IGeneratorType headerItems = new HeaderedItemsControlGeneratorType();
+            Generators.Add(headerItems.XamlType, headerItems);
+
+            IGeneratorType treeViewItem = new TreeViewItemGeneratorType();
+            Generators.Add(treeViewItem.XamlType, treeViewItem);
+        }
+
+        /// <summary>
+        /// Determines whether the specified type has generator.
+        /// </summary>
+        /// <param name="type">The type.</param>
+        /// <returns></returns>
+        public bool HasGenerator(Type type)
+        {
+            return Generators.ContainsKey(type);
         }
 
         /// <summary>

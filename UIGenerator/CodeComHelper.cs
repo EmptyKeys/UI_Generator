@@ -625,48 +625,10 @@ namespace EmptyKeys.UserInterface.Generator
                     BindingExpression commandBindingExpr = entry.Value as BindingExpression;
                     if (commandBindingExpr != null)
                     {
-                        PropertyPath path = commandBindingExpr.ParentBinding.Path;
+                        Binding binding = commandBindingExpr.ParentBinding;
+                        string varName = string.Format("{0}_{1}_{2}", "binding", sourceName, property.Name);
 
-                        CodeVariableReferenceExpression bindingVar = new CodeVariableReferenceExpression(string.Format("{0}_{1}_{2}", "binding", sourceName, property.Name));
-                        CodeTypeReference bindingClassRef = new CodeTypeReference("Binding");
-                        CodeVariableDeclarationStatement bindingDecl = new CodeVariableDeclarationStatement(bindingClassRef, bindingVar.VariableName);
-
-                        if (path != null)
-                        {
-                            bindingDecl.InitExpression = new CodeObjectCreateExpression("Binding", new CodePrimitiveExpression(path.Path));
-                        }
-                        else
-                        {
-                            bindingDecl.InitExpression = new CodeObjectCreateExpression("Binding");
-                        }
-                        
-                        method.Statements.Add(bindingDecl);
-
-                        if (commandBindingExpr.ParentBinding.Mode != BindingMode.Default)
-                        {
-                            GenerateEnumField(method, bindingVar, "Mode", "BindingMode", commandBindingExpr.ParentBinding.Mode.ToString());
-                        }                        
-
-                        if (commandBindingExpr.ParentBinding.FallbackValue != DependencyProperty.UnsetValue)
-                        {
-                            object fallBackValue = commandBindingExpr.ParentBinding.FallbackValue;
-                            if (fallBackValue.GetType().IsPrimitive || fallBackValue is string)
-                            {
-                                GenerateField(method, bindingVar, "FallbackValue", fallBackValue);
-                            }
-                            else
-                            {
-                                string warningText = "Only primitive types are supported for FallbackValue.";
-                                Console.WriteLine(warningText);
-                                CodeSnippetStatement warning = new CodeSnippetStatement("#warning " + warningText);
-                                method.Statements.Add(warning);
-                            }
-                        }
-
-                        if (!string.IsNullOrEmpty(commandBindingExpr.ParentBinding.StringFormat))
-                        {
-                            GenerateField(method, bindingVar, "StringFormat", commandBindingExpr.ParentBinding.StringFormat);
-                        }
+                        CodeVariableReferenceExpression bindingVar = GenerateBinding(method, binding, varName);
 
                         if (setBindingSource && bindingSource != null)
                         {
@@ -701,6 +663,60 @@ namespace EmptyKeys.UserInterface.Generator
                     }
                 }
             }
+        }
+
+        /// <summary>
+        /// Generates the binding.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <param name="binding">The binding.</param>
+        /// <param name="varName">Name of the variable.</param>
+        /// <returns></returns>
+        public static CodeVariableReferenceExpression GenerateBinding(CodeMemberMethod method, Binding binding, string varName)
+        {
+            PropertyPath path = binding.Path;
+            CodeVariableReferenceExpression bindingVar = new CodeVariableReferenceExpression(varName);
+            CodeTypeReference bindingClassRef = new CodeTypeReference("Binding");
+            CodeVariableDeclarationStatement bindingDecl = new CodeVariableDeclarationStatement(bindingClassRef, bindingVar.VariableName);
+
+            if (path != null)
+            {
+                bindingDecl.InitExpression = new CodeObjectCreateExpression("Binding", new CodePrimitiveExpression(path.Path));
+            }
+            else
+            {
+                bindingDecl.InitExpression = new CodeObjectCreateExpression("Binding");
+            }
+
+            method.Statements.Add(bindingDecl);
+
+            if (binding.Mode != BindingMode.Default)
+            {
+                GenerateEnumField(method, bindingVar, "Mode", "BindingMode", binding.Mode.ToString());
+            }
+
+            if (binding.FallbackValue != DependencyProperty.UnsetValue)
+            {
+                object fallBackValue = binding.FallbackValue;
+                if (fallBackValue.GetType().IsPrimitive || fallBackValue is string)
+                {
+                    GenerateField(method, bindingVar, "FallbackValue", fallBackValue);
+                }
+                else
+                {
+                    string warningText = "Only primitive types are supported for FallbackValue.";
+                    Console.WriteLine(warningText);
+                    CodeSnippetStatement warning = new CodeSnippetStatement("#warning " + warningText);
+                    method.Statements.Add(warning);
+                }
+            }
+
+            if (!string.IsNullOrEmpty(binding.StringFormat))
+            {
+                GenerateField(method, bindingVar, "StringFormat", binding.StringFormat);
+            }
+
+            return bindingVar;
         }
 
         /// <summary>
@@ -900,10 +916,24 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="property">The property.</param>
         public static void GenerateTemplateStyleField(CodeTypeDeclaration parentClass, CodeMemberMethod method, CodeExpression target, DependencyObject source, DependencyProperty property)
         {
+            GenerateTemplateStyleField(parentClass, method, target, source, property, ((FrameworkElement)source).Name);            
+        }
+
+        /// <summary>
+        /// Generates the template style field.
+        /// </summary>
+        /// <param name="parentClass">The parent class.</param>
+        /// <param name="method">The method.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="property">The property.</param>
+        /// <param name="name">The name.</param>
+        public static void GenerateTemplateStyleField(CodeTypeDeclaration parentClass, CodeMemberMethod method, CodeExpression target, DependencyObject source, DependencyProperty property, string name)
+        {
             if (IsValidForFieldGenerator(source.ReadLocalValue(property)))
             {
                 object value = source.GetValue(property);
-                CodeExpression valueExpr = GetValueExpression(parentClass, method, value, ((FrameworkElement)source).Name);
+                CodeExpression valueExpr = GetValueExpression(parentClass, method, value, name);
                 method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(target, property.Name), valueExpr));
             }
         }

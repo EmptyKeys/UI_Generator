@@ -61,8 +61,16 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="RenderMode.cs" />
     <Compile Include="ResourceDictionaryGenerator.cs" />
+    <Compile Include="Types\Controls\DataGridBoundColumnGeneratorType.cs" />
+    <Compile Include="Types\Controls\DataGridCheckBoxColumnGeneratorType.cs" />
+    <Compile Include="Types\Controls\DataGridColumnGeneratorType.cs" />
+    <Compile Include="Types\Controls\DataGridTemplateColumnGeneratorType.cs" />
+    <Compile Include="Types\Controls\DataGridTextColumnGeneratorType.cs" />
     <Compile Include="Types\Controls\DockPanelGeneratorType.cs" />
     <Compile Include="Types\Controls\CanvasGeneratorType.cs" />
+    <Compile Include="Types\Controls\HeaderedItemsControlGeneratorType.cs" />
+    <Compile Include="Types\Controls\TreeViewGeneratorType.cs" />
+    <Compile Include="Types\Controls\TreeViewItemGeneratorType.cs" />
     <Compile Include="Types\CustomUserControlGeneratorType.cs" />
     <Compile Include="Types\AnimatedImageGeneratorType.cs" />
     <Compile Include="Types\NumericTextBoxGeneratorType.cs" />
@@ -116,6 +124,7 @@
     <Compile Include="Values\ColorGeneratorValue.cs" />
     <Compile Include="Values\DoubleAnimationGeneratorValue.cs" />
     <Compile Include="Values\EllipseGeometryGeneratorValue.cs" />
+    <Compile Include="Values\FontFamilyGeneratorValue.cs" />
     <Compile Include="Values\LineGeometryGeneratorValue.cs" />
     <Compile Include="Values\RectangleGeometryGeneratorValue.cs" />
     <Compile Include="Values\SolidColorBrushAnimGeneratorValue.cs" />
