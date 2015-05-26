@@ -15,6 +15,9 @@ namespace EmptyKeys.UserInterface.Generator.Types
     /// </summary>
     public class LabelGeneratorType : ElementGeneratorType
     {
+        /// <summary>
+        /// The XamlType for labels
+        /// </summary>
         public override Type XamlType
         {
             get
@@ -23,6 +26,14 @@ namespace EmptyKeys.UserInterface.Generator.Types
             }
         }
 
+        /// <summary>
+        /// Generates the code for the label
+        /// </summary>
+        /// <param name="source">The source object</param>
+        /// <param name="classType">The class</param>
+        /// <param name="method">The member method</param>
+        /// <param name="generateField">Whether to generate a field</param>
+        /// <returns></returns>
         public override System.CodeDom.CodeExpression Generate(System.Windows.DependencyObject source, System.CodeDom.CodeTypeDeclaration classType, System.CodeDom.CodeMemberMethod method, bool generateField)
         {
             var textBlock = CreateTextBlockFromLabel(source as Label);

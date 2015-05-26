@@ -35,6 +35,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="inputFileName">Name of the input file.</param>
         /// <param name="inputFileContent">Content of the input file.</param>
         /// <param name="renderMode">The render mode.</param>
+        /// <param name="desiredNamespace">The namespace to put the code in</param>
         /// <returns></returns>
         public string GenerateCode(string inputFileName, string inputFileContent, RenderMode renderMode, string desiredNamespace)
         {
