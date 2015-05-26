@@ -35,8 +35,9 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="inputFileName">Name of the input file.</param>
         /// <param name="inputFileContent">Content of the input file.</param>
         /// <param name="renderMode">The render mode.</param>
+        /// <param name="desiredNamespace">The namespace to put the code in</param>
         /// <returns></returns>
-        public string GenerateCode(string inputFileName, string inputFileContent, RenderMode renderMode)
+        public string GenerateCode(string inputFileName, string inputFileContent, RenderMode renderMode, string desiredNamespace)
         {
             inputFileContent = RemoveClass(inputFileContent);
 
@@ -62,7 +63,7 @@ namespace EmptyKeys.UserInterface.Generator
             string resultCode = string.Empty;
             string className = Path.GetFileNameWithoutExtension(inputFileName);
 
-            CodeNamespace ns = new CodeNamespace("EmptyKeys.UserInterface.Generated");
+            CodeNamespace ns = new CodeNamespace(desiredNamespace);
             ns.Imports.Add(new CodeNamespaceImport("System"));
             ns.Imports.Add(new CodeNamespaceImport("System.CodeDom.Compiler"));
             ns.Imports.Add(new CodeNamespaceImport("System.Collections.ObjectModel"));
@@ -70,13 +71,13 @@ namespace EmptyKeys.UserInterface.Generator
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Data"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls.Primitives"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Input"));            
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Input"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Animation"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Imaging"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Shapes"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Renderers"));            
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));            
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Renderers"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));
 
             /*
             switch (renderMode)
@@ -91,7 +92,7 @@ namespace EmptyKeys.UserInterface.Generator
                 default:
                     break;
             }
-             */ 
+             */
 
             CodeTypeDeclaration classType = new CodeTypeDeclaration(className);
 
@@ -177,7 +178,7 @@ namespace EmptyKeys.UserInterface.Generator
             }
 
             return xml.OuterXml;
-        }        
+        }
 
         private CodeMemberMethod CreateDictionaryClass(CodeNamespace ns, CodeTypeDeclaration classType)
         {

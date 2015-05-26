@@ -65,6 +65,7 @@
     <Compile Include="Types\Controls\CanvasGeneratorType.cs" />
     <Compile Include="Types\CustomUserControlGeneratorType.cs" />
     <Compile Include="Types\AnimatedImageGeneratorType.cs" />
+    <Compile Include="Types\LabelGeneratorType.cs" />
     <Compile Include="Types\NumericTextBoxGeneratorType.cs" />
     <Compile Include="Types\PasswordBoxGeneratorType.cs" />
     <Compile Include="Types\Shapes\LineGeneratorType.cs" />
