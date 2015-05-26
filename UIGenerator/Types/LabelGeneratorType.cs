@@ -37,7 +37,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
         public override System.CodeDom.CodeExpression Generate(System.Windows.DependencyObject source, System.CodeDom.CodeTypeDeclaration classType, System.CodeDom.CodeMemberMethod method, bool generateField)
         {
             var textBlock = CreateTextBlockFromLabel(source as Label);
-            CodeExpression fieldReference = base.Generate(textBlock, classType, method, generateField);
+            CodeExpression fieldReference = base.Generate(source, classType, method, generateField);
 
             CodeComHelper.GenerateBrushField(method, fieldReference, source, TextBlock.BackgroundProperty);
             CodeComHelper.GenerateBrushField(method, fieldReference, source, TextBlock.ForegroundProperty);
@@ -76,26 +76,6 @@ namespace EmptyKeys.UserInterface.Generator.Types
         private TextBlock CreateTextBlockFromLabel(Label label)
         {
             var block = new TextBlock();
-
-            block.Name = label.Name;
-            block.Height = label.Height;
-            block.MaxHeight = label.MaxHeight;
-            block.MinHeight = label.MinHeight;
-            block.Width = label.Width;
-            block.MaxWidth = label.MaxWidth;
-            block.MinWidth = label.MinWidth;
-            block.Tag = label.Tag;
-            block.IsEnabled = label.IsEnabled;
-            block.IsHitTestVisible = label.IsHitTestVisible;
-            block.SnapsToDevicePixels = label.SnapsToDevicePixels;
-            block.Focusable = label.Focusable;
-            block.Visibility = label.Visibility;
-            block.Margin = label.Margin;
-            block.HorizontalAlignment = label.HorizontalAlignment;
-            block.VerticalAlignment = label.VerticalAlignment;
-            block.ToolTip = label.ToolTip;
-            block.Opacity = label.Opacity;
-
             block.Foreground = label.Foreground;
             block.Background = label.Background;
 
