@@ -11,7 +11,7 @@ using Mono.Options;
 namespace ekUiGen
 {
     class Program
-    {        
+    {
         [STAThread]
         static int Main(string[] args)
         {
@@ -25,6 +25,7 @@ namespace ekUiGen
             string assetOutputDirectory = string.Empty;
             string assetInputDirectory = string.Empty;
             RenderMode renderMode = RenderMode.SunBurn;
+            string desiredNamespace = string.Empty;
 
             var optionSet = new OptionSet()
                 .Add("?|help|h", "Command line help", o => showHelp = o != null)
@@ -35,8 +36,11 @@ namespace ekUiGen
                 .Add("ignore-assets", "Ignore all asset files and just generate .xaml.cs files", o => IgnoreImageAssets = IgnoreFontAssets = o != null)
                 .Add<string>("ia=", "Input asset directory to copy images from", o => assetInputDirectory = o)
                 .Add<string>("oa=", "Output Asset directory for generated sprite fonts and images", o => assetOutputDirectory = o)
-                .Add<RenderMode>("render|rendermode|rm=", "Render mode (SunBurn/MonoGame)", o => renderMode = o);
-                
+                .Add<RenderMode>("rm=",
+                    String.Format("Render mode ({0})", String.Join(", ", Enum.GetNames(typeof(RenderMode)))),
+                    o => renderMode = o)
+                .Add<string>("ns|namespace=", "The namespace to generate the code under", o => desiredNamespace = o);
+
             try
             {
                 optionSet.Parse(args);
@@ -54,7 +58,7 @@ namespace ekUiGen
                 ShowHelp(optionSet);
                 return 0;
             }
-                        
+
             if (string.IsNullOrEmpty(inputDirectory))
             {
                 Console.WriteLine("ERROR: You must specify an input directory.");
@@ -81,6 +85,11 @@ namespace ekUiGen
                 Console.WriteLine("WARNING: No asset output directory specified. No image or font files will be created (specify --ignore-assets if this was intentional).");
             }
 
+            if (string.IsNullOrEmpty(desiredNamespace))
+            {
+                desiredNamespace = "EmptyKeys.UserInterface.Generated";                
+            }
+
             if (!Directory.Exists(outputDirectory))
             {
                 Directory.CreateDirectory(outputDirectory);
@@ -92,7 +101,7 @@ namespace ekUiGen
                 {
                     Directory.CreateDirectory(assetOutputDirectory);
                 }
-                catch(Exception e)
+                catch (Exception e)
                 {
                     Console.WriteLine("Error creating asset output directory: " + e.Message);
                     return -1;
@@ -106,7 +115,7 @@ namespace ekUiGen
 
                 try
                 {
-                    Generate(file, outputFile, renderMode);
+                    Generate(file, outputFile, renderMode, desiredNamespace);
                 }
                 catch (Exception ex)
                 {
@@ -141,7 +150,7 @@ namespace ekUiGen
             return 0;
         }
 
-        private static void Generate(string xamlFile, string outputFile, RenderMode renderMode)
+        private static void Generate(string xamlFile, string outputFile, RenderMode renderMode, string desiredNamespace)
         {
             string xaml = string.Empty;
             using (TextReader tr = File.OpenText(xamlFile))
@@ -150,7 +159,7 @@ namespace ekUiGen
             }
 
             UserInterfaceGenerator generator = new UserInterfaceGenerator();
-            string generatedCode = generator.GenerateCode(xamlFile, xaml, renderMode);
+            string generatedCode = generator.GenerateCode(xamlFile, xaml, renderMode, desiredNamespace);
 
             using (StreamWriter outfile = new StreamWriter(outputFile))
             {

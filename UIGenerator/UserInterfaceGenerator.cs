@@ -35,8 +35,9 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="inputFileName">Name of the input file.</param>
         /// <param name="inputFileContent">Content of the input file.</param>
         /// <param name="renderMode">The render mode.</param>
+        /// <param name="desiredNamespace">The desired namespace.</param>
         /// <returns></returns>
-        public string GenerateCode(string inputFileName, string inputFileContent, RenderMode renderMode)
+        public string GenerateCode(string inputFileName, string inputFileContent, RenderMode renderMode, string desiredNamespace)
         {
             inputFileContent = RemoveClass(inputFileContent);
 
@@ -62,7 +63,7 @@ namespace EmptyKeys.UserInterface.Generator
             string resultCode = string.Empty;
             string className = Path.GetFileNameWithoutExtension(inputFileName);
 
-            CodeNamespace ns = new CodeNamespace("EmptyKeys.UserInterface.Generated");
+            CodeNamespace ns = new CodeNamespace(desiredNamespace);
             ns.Imports.Add(new CodeNamespaceImport("System"));
             ns.Imports.Add(new CodeNamespaceImport("System.CodeDom.Compiler"));
             ns.Imports.Add(new CodeNamespaceImport("System.Collections.ObjectModel"));

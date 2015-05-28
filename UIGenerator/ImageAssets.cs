@@ -53,7 +53,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="TargetDir">The assets directory.</param>
         public bool CopyImagesToAssetDirectory(string TargetDir)
         {
-            string SourceDir = Path.GetDirectoryName(Environment.CurrentDirectory);
+            string SourceDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             return CopyImagesToAssetDirectory(TargetDir, SourceDir);
         }
 
@@ -62,6 +62,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// </summary>
         /// <param name="TargetDir">The assets directory.</param>
         /// <param name="SourceDir">The directory to copy assets from.</param>
+        /// <returns></returns>
         public bool CopyImagesToAssetDirectory(string TargetDir, string SourceDir)
         {
             foreach (string asset in imageAssets)
