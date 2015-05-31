@@ -189,6 +189,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType treeViewItem = new TreeViewItemGeneratorType();
             Generators.Add(treeViewItem.XamlType, treeViewItem);
+
+            IGeneratorType wrapPanel = new WrapPanelGeneratorType();
+            Generators.Add(wrapPanel.XamlType, wrapPanel);
         }
 
         /// <summary>
