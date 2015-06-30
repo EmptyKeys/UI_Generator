@@ -49,6 +49,8 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateBrushField(method, fieldReference, source, Control.ForegroundProperty);
             CodeComHelper.GenerateEnumField<HorizontalAlignment>(method, fieldReference, source, Control.HorizontalContentAlignmentProperty);
             CodeComHelper.GenerateEnumField<VerticalAlignment>(method, fieldReference, source, Control.VerticalContentAlignmentProperty);
+            CodeComHelper.GenerateField<bool>(method, fieldReference, source, Control.IsTabStopProperty);
+            CodeComHelper.GenerateField<int>(method, fieldReference, source, Control.TabIndexProperty);
 
             CodeComHelper.GenerateTemplateStyleField(classType, method, fieldReference, source, Control.TemplateProperty);
 

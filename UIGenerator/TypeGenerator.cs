@@ -9,6 +9,7 @@ using System.Windows;
 using System.Windows.Controls;
 using EmptyKeys.UserInterface.Generator.Types;
 using EmptyKeys.UserInterface.Generator.Types.Controls;
+using EmptyKeys.UserInterface.Generator.Types.Controls.Primitives;
 using EmptyKeys.UserInterface.Generator.Types.Shapes;
 
 namespace EmptyKeys.UserInterface.Generator
@@ -192,6 +193,12 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType wrapPanel = new WrapPanelGeneratorType();
             Generators.Add(wrapPanel.XamlType, wrapPanel);
+
+            IGeneratorType popup = new PopupGeneratorType();
+            Generators.Add(popup.XamlType, popup);
+
+            IGeneratorType tabPanel = new TabPanelGeneratorType();
+            Generators.Add(tabPanel.XamlType, tabPanel);
         }
 
         /// <summary>

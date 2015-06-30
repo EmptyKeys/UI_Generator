@@ -19,11 +19,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <value>
         /// The font family.
         /// </value>
-        public FontFamily FontFamily
-        {
-            get;
-            set;
-        }
+        public FontFamily FontFamily { get; set; }        
 
         /// <summary>
         /// Gets or sets the size of the font.
@@ -31,11 +27,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <value>
         /// The size of the font.
         /// </value>
-        public double FontSize
-        {
-            get;
-            set;
-        }
+        public double FontSize { get; set; }
 
         /// <summary>
         /// Gets or sets the font style.
@@ -43,11 +35,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <value>
         /// The font style.
         /// </value>
-        public FontStyle FontStyle
-        {
-            get;
-            set;
-        }
+        public FontStyle FontStyle { get; set; }
 
         /// <summary>
         /// Gets or sets the font weight.
@@ -55,11 +43,15 @@ namespace EmptyKeys.UserInterface.Generator
         /// <value>
         /// The font weight.
         /// </value>
-        public FontWeight FontWeight
-        {
-            get;
-            set;
-        }
+        public FontWeight FontWeight { get; set; }
+
+        /// <summary>
+        /// Gets or sets a value indicating whether manager code is generated.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if manager code is generated; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsManagerCodeGenerated { get; set; }
 
         /// <summary>
         /// Initializes a new instance of the <see cref="FontInfo"/> class.

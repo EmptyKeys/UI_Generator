@@ -19,6 +19,11 @@ namespace EmptyKeys.UserInterface.Designer
         ButtonsClick,
 
         /// <summary>
+        /// The buttons hover
+        /// </summary>
+        ButtonsHover,
+
+        /// <summary>
         /// The ListBox move sound
         /// </summary>
         ListBoxMove,
@@ -41,6 +46,11 @@ namespace EmptyKeys.UserInterface.Designer
         /// <summary>
         /// The tab control select sound
         /// </summary>
-        TabControlSelect
+        TabControlSelect,
+
+        /// <summary>
+        /// The CheckBox hover
+        /// </summary>
+        CheckBoxHover
     }
 }

@@ -62,6 +62,8 @@
     </Compile>
     <Compile Include="AnimatedImageBrush.cs" />
     <Compile Include="AnimatedImage.cs" />
+    <Compile Include="DragDrop.cs" />
+    <Compile Include="EventTrigger.cs" />
     <Compile Include="Input\GamepadBinding.cs" />
     <Compile Include="Input\GamepadGesture.cs" />
     <Compile Include="Input\GamepadInput.cs" />

@@ -72,6 +72,8 @@
     <Compile Include="Types\Controls\DockPanelGeneratorType.cs" />
     <Compile Include="Types\Controls\CanvasGeneratorType.cs" />
     <Compile Include="Types\Controls\HeaderedItemsControlGeneratorType.cs" />
+    <Compile Include="Types\Controls\Primitives\PopupGeneratorType.cs" />
+    <Compile Include="Types\Controls\Primitives\TabPanelGeneratorType.cs" />
     <Compile Include="Types\Controls\TreeViewGeneratorType.cs" />
     <Compile Include="Types\Controls\TreeViewItemGeneratorType.cs" />
     <Compile Include="Types\Controls\WrapPanelGeneratorType.cs" />

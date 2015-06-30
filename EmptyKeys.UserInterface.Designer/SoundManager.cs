@@ -42,5 +42,32 @@ namespace EmptyKeys.UserInterface.Designer
         {
             obj.SetValue(SoundsProperty, value);
         }
+
+        /// <summary>
+        /// The is sound enabled property
+        /// </summary>
+        public static readonly DependencyProperty IsSoundEnabledProperty =
+            DependencyProperty.RegisterAttached("IsSoundEnabled", typeof(bool), typeof(SoundManager),
+            new FrameworkPropertyMetadata(true));
+
+        /// <summary>
+        /// Gets the is sound enabled.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <returns></returns>
+        public static bool GetIsSoundEnabled(DependencyObject obj)
+        {
+            return (bool)obj.GetValue(IsSoundEnabledProperty);
+        }
+
+        /// <summary>
+        /// Sets the is sound enabled.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="value">if set to <c>true</c> [value].</param>
+        public static void SetIsSoundEnabled(DependencyObject obj, bool value)
+        {
+            obj.SetValue(IsSoundEnabledProperty, value);
+        }
     }
 }

@@ -43,6 +43,8 @@ namespace EmptyKeys.UserInterface.Generator.Types
             Track track = source as Track;
             if (track != null)
             {
+                CodeComHelper.GenerateField<bool>(method, fieldReference, source, Track.IsDirectionReversedProperty);
+
                 TypeGenerator generator = new TypeGenerator();
 
                 if (track.IncreaseRepeatButton != null)

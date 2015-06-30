@@ -41,6 +41,44 @@ namespace EmptyKeys.UserInterface.Designer
         }
 
         /// <summary>
+        /// The is tab navigation enabled property
+        /// </summary>
+        public static readonly DependencyProperty IsTabNavigationEnabledProperty =
+            DependencyProperty.Register("IsTabNavigationEnabled", typeof(bool), typeof(UIRoot),
+            new FrameworkPropertyMetadata(true));
+
+        /// <summary>
+        /// Gets or sets a value indicating whether this instance is tab navigation enabled.
+        /// </summary>
+        /// <value>
+        /// <c>true</c> if this instance is tab navigation enabled; otherwise, <c>false</c>.
+        /// </value>
+        public bool IsTabNavigationEnabled
+        {
+            get { return (bool)GetValue(IsTabNavigationEnabledProperty); }
+            set { SetValue(IsTabNavigationEnabledProperty, value); }
+        }
+
+        /// <summary>
+        /// The message box overlay property{CC2D43FA-BBC4-448A-9D0B-7B57ADF2655C}
+        /// </summary>
+        public static readonly DependencyProperty MessageBoxOverlayProperty =
+            DependencyProperty.Register("MessageBoxOverlay", typeof(Color), typeof(UIRoot),
+            new FrameworkPropertyMetadata(new Color { A = 127 }));
+
+        /// <summary>
+        /// Gets or sets the message box overlay.
+        /// </summary>
+        /// <value>
+        /// The message box overlay.
+        /// </value>
+        public Color MessageBoxOverlay
+        {
+            get { return (Color)GetValue(MessageBoxOverlayProperty); }
+            set { SetValue(MessageBoxOverlayProperty, value); }
+        }
+
+        /// <summary>
         /// Initializes the <see cref="UIRoot"/> class.
         /// </summary>
         static UIRoot()

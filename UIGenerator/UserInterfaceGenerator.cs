@@ -142,6 +142,11 @@ namespace EmptyKeys.UserInterface.Generator
                 return errorText;
             }
 
+            ImageAssets.Instance.GenerateManagerCode(initMethod);
+            ImageAssets.Instance.ClearAssets();
+
+            FontGenerator.Instance.GenerateManagerCode(initMethod);
+
             using (CodeDomProvider provider = new Microsoft.CSharp.CSharpCodeProvider())
             {
                 string mappedFileName = memoryMappedFileName + className;

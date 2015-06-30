@@ -3,6 +3,7 @@ using System.CodeDom;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
+using System.Windows.Input;
 
 namespace EmptyKeys.UserInterface.Generator.Types
 {
@@ -36,7 +37,14 @@ namespace EmptyKeys.UserInterface.Generator.Types
         public override CodeExpression Generate(DependencyObject source, CodeTypeDeclaration classType, CodeMemberMethod initMethod, bool generateField)
         {
             CodeExpression fieldReference = base.Generate(source, classType, initMethod, generateField);
-            ButtonBase buttonBase = source as ButtonBase;            
+            ButtonBase buttonBase = source as ButtonBase;
+
+            RoutedCommand command = buttonBase.Command as RoutedCommand;
+            if (command != null && !string.IsNullOrEmpty(command.Name) && command.OwnerType != null)
+            {                
+                initMethod.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(fieldReference, "Command"), 
+                    new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(command.OwnerType.Name), command.Name + "Command")));
+            }
 
             CodeComHelper.GenerateField<object>(initMethod, fieldReference, source, ButtonBase.CommandParameterProperty);
             CodeComHelper.GenerateEnumField<ClickMode>(initMethod, fieldReference, source, ButtonBase.ClickModeProperty);

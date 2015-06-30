@@ -67,7 +67,18 @@ namespace EmptyKeys.UserInterface.Generator.Values
                         }
                         CodeExpression keyExpression = CodeComHelper.GetResourceKeyExpression(key);
                         string basedOnVarName = variableName + "_bo";
-                        CodeArrayIndexerExpression initExpr = new CodeArrayIndexerExpression(new CodeThisReferenceExpression(), keyExpression);
+
+                        CodeArrayIndexerExpression initExpr = null;
+                        if (method.Parameters.Count == 1 && method.Parameters[0].Name == "elem")
+                        {
+                            initExpr = new CodeArrayIndexerExpression(
+                                new CodeFieldReferenceExpression(new CodeVariableReferenceExpression(method.Parameters[0].Name), "Resources"), keyExpression);
+                        }
+                        else
+                        {
+                            initExpr = new CodeArrayIndexerExpression(new CodeThisReferenceExpression(), keyExpression);
+                        }
+
                         method.Statements.Add(new CodeVariableDeclarationStatement("var", basedOnVarName, initExpr));
 
                         styleVar =

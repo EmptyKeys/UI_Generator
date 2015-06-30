@@ -54,19 +54,28 @@ namespace EmptyKeys.UserInterface.Generator
         public void AddFont(FontFamily family, double size, FontStyle style, FontWeight weight, CodeMemberMethod method)
         {
             FontInfo info = new FontInfo(family, size, style, weight);
-            fonts[info.GetHashCode()] = info;
+            fonts[info.GetHashCode()] = info;            
+        }
 
-            string fontName = GetFontName(info);
-            float fontSize = GetFontSize(info);
-            string fontStyle = GetFontStyle(info);
-            string assetName = GetFontAssetName(fontName, fontSize, fontStyle);
+        /// <summary>
+        /// Generates the manager code.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        public void GenerateManagerCode(CodeMemberMethod method)
+        {
+            foreach (var info in fonts.Values)
+            {
+                string fontName = GetFontName(info);
+                float fontSize = GetFontSize(info);
+                string fontStyle = GetFontStyle(info);
+                string assetName = GetFontAssetName(fontName, fontSize, fontStyle);
 
-            CodeExpression styleExpr = CodeComHelper.GenerateFontStyleExpression(style, weight);
-            CodeExpression familyExpr = CodeComHelper.GenerateFontFamilyExpression(family);
+                CodeExpression styleExpr = CodeComHelper.GenerateFontStyleExpression(info.FontStyle, info.FontWeight);
 
-            method.Statements.Add(new CodeMethodInvokeExpression(
-                new CodeTypeReferenceExpression("FontManager"), "Instance.AddFont",
-                    new CodePrimitiveExpression(fontName), new CodePrimitiveExpression((float)size), styleExpr, new CodePrimitiveExpression(assetName)));
+                method.Statements.Add(new CodeMethodInvokeExpression(
+                    new CodeTypeReferenceExpression("FontManager"), "Instance.AddFont",
+                        new CodePrimitiveExpression(fontName), new CodePrimitiveExpression((float)info.FontSize), styleExpr, new CodePrimitiveExpression(assetName)));
+            }
         }
 
         /// <summary>

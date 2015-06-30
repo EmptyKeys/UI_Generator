@@ -1,4 +1,5 @@
 ﻿using System;
+using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -30,21 +31,52 @@ namespace EmptyKeys.UserInterface.Generator
         }
 
         private List<string> imageAssets = new List<string>();
+        private List<string> files = new List<string>();
 
         private ImageAssets()
         {
         }
 
         /// <summary>
-        /// Adds the image.
+        /// Adds the image asset
         /// </summary>
-        /// <param name="fileName">Name of the asset.</param>
-        public void AddImage(string fileName)
+        /// <param name="assetName">Name of the asset.</param>
+        /// <param name="extension">The extension.</param>
+        public void AddImage(string assetName, string extension)
         {
-            if (!imageAssets.Contains(fileName))
+            if (!imageAssets.Contains(assetName))
             {
-                imageAssets.Add(fileName);
+                imageAssets.Add(assetName);
+                string assetFile = assetName + extension;
+                if (!files.Contains(assetFile))
+                {
+                    files.Add(assetFile);
+                }
             }
+        }
+
+        /// <summary>
+        /// Generates the manager code.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        public void GenerateManagerCode(CodeMemberMethod method)
+        {
+            foreach (var asset in imageAssets)
+            {                
+                method.Statements.Add(new CodeMethodInvokeExpression(
+                    new CodeFieldReferenceExpression(
+                        new CodeTypeReferenceExpression("ImageManager"), "Instance"),
+                        "AddImage",
+                        new CodePrimitiveExpression(asset)));
+            }
+        }
+
+        /// <summary>
+        /// Clears the assets.
+        /// </summary>
+        public void ClearAssets()
+        {
+            imageAssets.Clear();
         }
 
         /// <summary>
@@ -65,7 +97,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <returns></returns>
         public bool CopyImagesToAssetDirectory(string TargetDir, string SourceDir)
         {
-            foreach (string asset in imageAssets)
+            foreach (string asset in files)
             {
                 string sourceFile = Path.Combine(SourceDir, asset);
                 string target = Path.Combine(TargetDir, asset);

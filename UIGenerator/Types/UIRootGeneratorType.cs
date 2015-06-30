@@ -44,6 +44,8 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateThicknessField(method, fieldReference, source, Control.BorderThicknessProperty);
             CodeComHelper.GenerateThicknessField(method, fieldReference, source, Control.PaddingProperty);
             CodeComHelper.GenerateBrushField(method, fieldReference, source, Control.ForegroundProperty);
+            CodeComHelper.GenerateField<bool>(method, fieldReference, source, UIRoot.IsTabNavigationEnabledProperty);
+            CodeComHelper.GenerateColorField(method, fieldReference, source, UIRoot.MessageBoxOverlayProperty);
 
             CodeComHelper.GenerateTemplateStyleField(classType, method, fieldReference, source, FrameworkElement.StyleProperty);
 

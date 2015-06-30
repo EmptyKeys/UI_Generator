@@ -12,6 +12,7 @@ using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 using System.Windows.Data;
+using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
@@ -63,6 +64,10 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("Action");
             supportedAttachedProperties.Add("VerticalOffset");
             supportedAttachedProperties.Add("HorizontalOffset");
+            supportedAttachedProperties.Add("IsDragSource");
+            supportedAttachedProperties.Add("IsDropTarget");
+            supportedAttachedProperties.Add("CommandPath");
+            supportedAttachedProperties.Add("CommandParameter");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");
@@ -379,7 +384,7 @@ namespace EmptyKeys.UserInterface.Generator
                     new CodePrimitiveExpression(solid.Color.G),
                     new CodePrimitiveExpression(solid.Color.B),
                     new CodePrimitiveExpression(solid.Color.A));
-                brushExpr = new CodeObjectCreateExpression(brushTypeName, colorExpr);
+                brushExpr = new CodeObjectCreateExpression(brushTypeName, colorExpr);                
                 return brushExpr;
             }
 
@@ -423,16 +428,16 @@ namespace EmptyKeys.UserInterface.Generator
                                 new CodePrimitiveExpression((float)stop.Offset)));
                     method.Statements.Add(gradientStop);
                 }
-
+                
                 return brushExpr;
             }
 
             ImageBrush image = brush as ImageBrush;
             if (image != null)
             {
-                brushExpr = GenerateImageBrush(method, variableName, brushTypeName, brushExpr, image);
+                brushExpr = GenerateImageBrush(method, variableName, brushTypeName, brushExpr, image);                
                 return brushExpr;
-            }
+            }            
 
             GenerateError(method, "Brush type not supported - " + brush.GetType());
 
@@ -455,6 +460,7 @@ namespace EmptyKeys.UserInterface.Generator
 
             GenerateEnumField<Stretch>(method, brushExpr, image, ImageBrush.StretchProperty);
             GenerateEnumField<BrushMappingMode>(method, brushExpr, image, ImageBrush.ViewboxUnitsProperty);
+            GenerateFieldDoubleToFloat(method, brushExpr, image, Brush.OpacityProperty);
             GenerateRect(method, brushExpr, image, ImageBrush.ViewboxProperty);
 
             GenerateAttachedProperties(method, brushExpr, image);
@@ -525,14 +531,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             method.Statements.Add(new CodeAssignStatement(
                 new CodeFieldReferenceExpression(new CodeVariableReferenceExpression(variableName), "TextureAsset"),
-                new CodePrimitiveExpression(imageAsset)));
+                new CodePrimitiveExpression(imageAsset)));            
 
-            method.Statements.Add(new CodeMethodInvokeExpression(
-                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression("ImageManager"), "Instance"),
-                "AddImage",
-                new CodePrimitiveExpression(imageAsset)));
-
-            ImageAssets.Instance.AddImage(imageAsset + extension);
+            ImageAssets.Instance.AddImage(imageAsset, extension);
 
             return new CodeVariableReferenceExpression(variableName);
         }
@@ -1038,7 +1039,7 @@ namespace EmptyKeys.UserInterface.Generator
                     continue;
                 }
 
-                EventTrigger eventTrigger = triggerBase as EventTrigger;
+                System.Windows.EventTrigger eventTrigger = triggerBase as System.Windows.EventTrigger;
                 if (eventTrigger != null)
                 {
                     GenerateEventTrigger(parentClass, method, targetType.Name, null, variableName, triggerIndex, eventTrigger);
@@ -1120,9 +1121,13 @@ namespace EmptyKeys.UserInterface.Generator
             CodeExpression setterValueExpr = GetValueExpression(parentClass, method, setterValue, setterVarName);
             if (setterValueExpr != null)
             {
-                if (targetType == null)
+                if (targetType == null || !string.IsNullOrEmpty(setter.TargetName))
                 {
                     targetType = setter.Property.OwnerType;
+                    if (targetType == typeof(TextElement))
+                    {
+                        targetType = typeof(TextBlock);
+                    }                    
                 }
 
                 CodeVariableDeclarationStatement setterVar =
@@ -1162,7 +1167,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="parentName">Name of the parent.</param>
         /// <param name="index">The index.</param>
         /// <param name="trigger">The trigger.</param>
-        public static void GenerateEventTrigger(CodeTypeDeclaration parentClass, CodeMemberMethod method, string typeName, CodeExpression fieldReference, string parentName, int index, EventTrigger trigger)
+        public static void GenerateEventTrigger(CodeTypeDeclaration parentClass, CodeMemberMethod method, string typeName, CodeExpression fieldReference, string parentName, int index, System.Windows.EventTrigger trigger)
         {
             string triggerVarName = parentName + "_ET_" + index;
             var routedEvent = new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(typeName), trigger.RoutedEvent.Name + "Event");
@@ -1178,8 +1183,8 @@ namespace EmptyKeys.UserInterface.Generator
                 method.Statements.Add(triggerVar);
             }
 
-            var addTrigger = new CodeMethodInvokeExpression(
-                    new CodeVariableReferenceExpression(parentName), "Triggers.Add", new CodeVariableReferenceExpression(triggerVarName));
+            var triggerVarRef = new CodeVariableReferenceExpression(triggerVarName);
+            var addTrigger = new CodeMethodInvokeExpression(new CodeVariableReferenceExpression(parentName), "Triggers.Add", triggerVarRef);
             method.Statements.Add(addTrigger);
 
             for (int j = 0; j < trigger.Actions.Count; j++)
@@ -1213,6 +1218,8 @@ namespace EmptyKeys.UserInterface.Generator
                     GenerateStoryboard(parentClass, method, beginStoryboard.Storyboard, actionName, typeName);
                 }
             }
+
+            GenerateAttachedProperties(method, triggerVarRef, trigger, typeName);            
         }
 
         private static void GenerateStoryboard(CodeTypeDeclaration classType, CodeMemberMethod method, Storyboard storyboard, string actionName, string typeName)
@@ -1310,7 +1317,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="target">The target.</param>
         /// <param name="source">The source.</param>
         /// <param name="property">The property.</param>
-        public static void GenerateColorField(CodeMemberMethod method, CodeExpression target, SolidColorBrushAnimation source, DependencyProperty property)
+        public static void GenerateColorField(CodeMemberMethod method, CodeExpression target, DependencyObject source, DependencyProperty property)
         {
             if (IsValidForFieldGenerator(source.ReadLocalValue(property)))
             {
