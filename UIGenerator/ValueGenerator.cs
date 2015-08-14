@@ -159,6 +159,10 @@ namespace EmptyKeys.UserInterface.Generator
                 CodeTypeReferenceExpression typeReference = new CodeTypeReferenceExpression(valueType.Name);
                 valueExpression = new CodeFieldReferenceExpression(typeReference, value.ToString());
             }
+            else if (valueType.BaseType.Name.Contains("ViewModelLocatorBase"))
+            {
+                valueExpression = new CodeObjectCreateExpression(valueType);
+            }
             else
             {
                 valueExpression = new CodePrimitiveExpression("NOT SUPPORTED!");

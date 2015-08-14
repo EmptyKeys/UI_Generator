@@ -182,10 +182,14 @@ namespace EmptyKeys.UserInterface.Generator.Types
                 {
                     DependencyObject depObject = element.InputBindings[i] as DependencyObject;                    
                     CodeComHelper.GenerateField<object>(method, bindingVarRef, depObject, InputBinding.CommandParameterProperty);
-                    CodeComHelper.GenerateBindings(method, bindingVarRef, depObject, bindingVarName, fieldReference, true);
+                    CodeComHelper.GenerateBindings(method, bindingVarRef, depObject, bindingVarName, fieldReference, false);
 
                     method.Statements.Add(new CodeMethodInvokeExpression(
                         new CodeVariableReferenceExpression(element.Name), "InputBindings.Add", new CodeVariableReferenceExpression(bindingVarName)));
+
+                    method.Statements.Add(new CodeAssignStatement(
+                        new CodeFieldReferenceExpression(new CodeVariableReferenceExpression(bindingVarName), "Parent"),
+                        new CodeVariableReferenceExpression(element.Name)));
                 }
             }
         }

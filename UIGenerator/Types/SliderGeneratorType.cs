@@ -41,6 +41,8 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeExpression fieldReference = base.Generate(source, classType, method, generateField);
 
             CodeComHelper.GenerateEnumField<Orientation>(method, fieldReference, source, Slider.OrientationProperty);
+            CodeComHelper.GenerateField<bool>(method, fieldReference, source, Slider.IsSnapToTickEnabledProperty);
+            CodeComHelper.GenerateFieldDoubleToFloat(method, fieldReference, source, Slider.TickFrequencyProperty);
 
             return fieldReference;
         }

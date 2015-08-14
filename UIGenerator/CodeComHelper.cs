@@ -68,6 +68,10 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("IsDropTarget");
             supportedAttachedProperties.Add("CommandPath");
             supportedAttachedProperties.Add("CommandParameter");
+            supportedAttachedProperties.Add("PanningMode");
+            supportedAttachedProperties.Add("PanningRatio");
+            supportedAttachedProperties.Add("PanningDeceleration");
+            supportedAttachedProperties.Add("IsMouseWheelEnabled");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");
@@ -210,6 +214,7 @@ namespace EmptyKeys.UserInterface.Generator
                     else if (contentType.IsSubclassOf(typeof(FrameworkElement)))
                     {
                         CodeMemberMethod initTemplateMethod = new CodeMemberMethod();
+                        initTemplateMethod.Attributes = MemberAttributes.Static | MemberAttributes.Private;
                         initTemplateMethod.ReturnType = new CodeTypeReference("UIElement");
                         initTemplateMethod.Name = variableName + "_Method";
 
@@ -227,7 +232,7 @@ namespace EmptyKeys.UserInterface.Generator
                             initTemplateMethod.Statements.Add(returnInitTemplateMethod);
                             parentClass.Members.Add(initTemplateMethod);
 
-                            contentExpr = new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), initTemplateMethod.Name);
+                            contentExpr = new CodeMethodInvokeExpression(null, initTemplateMethod.Name);
                         }
                     }
 
@@ -458,6 +463,11 @@ namespace EmptyKeys.UserInterface.Generator
                 GenerateBitmapImageField(method, brushExpr, bitmap.UriSource, variableName + "_bm", "ImageSource");
             }
 
+            if (BindingOperations.IsDataBound(image, ImageBrush.ImageSourceProperty))
+            {
+                CodeComHelper.GenerateBindings(method, brushExpr, image, variableName);
+            }
+
             GenerateEnumField<Stretch>(method, brushExpr, image, ImageBrush.StretchProperty);
             GenerateEnumField<BrushMappingMode>(method, brushExpr, image, ImageBrush.ViewboxUnitsProperty);
             GenerateFieldDoubleToFloat(method, brushExpr, image, Brush.OpacityProperty);
@@ -629,7 +639,7 @@ namespace EmptyKeys.UserInterface.Generator
                         Binding binding = commandBindingExpr.ParentBinding;
                         string varName = string.Format("{0}_{1}_{2}", "binding", sourceName, property.Name);
 
-                        CodeVariableReferenceExpression bindingVar = GenerateBinding(method, binding, varName);
+                        CodeVariableReferenceExpression bindingVar = GenerateBinding(method, binding, varName);                      
 
                         if (setBindingSource && bindingSource != null)
                         {
@@ -637,8 +647,26 @@ namespace EmptyKeys.UserInterface.Generator
                                 new CodeFieldReferenceExpression(bindingVar, "Source"), new CodeFieldReferenceExpression(bindingSource, "DataContext"));
                             method.Statements.Add(sourceStatement);
                         }
+                        else if (binding.Source != null)
+                        {
+                            Type type = binding.Source.GetType();
+                            if (type.BaseType.Name.Contains("ViewModelLocatorBase"))
+                            {
+                                bindingSource = new CodeObjectCreateExpression(type, new CodePrimitiveExpression(false));
+                                var sourceStatement = new CodeAssignStatement(
+                                    new CodeFieldReferenceExpression(bindingVar, "Source"), bindingSource);
+                                method.Statements.Add(sourceStatement);
+                            }
+                        }
 
                         CodeTypeReferenceExpression typeReference = new CodeTypeReferenceExpression(source.GetType().Name);
+                        DependencyPropertyDescriptor dpd = DependencyPropertyDescriptor.FromProperty(property, source.GetType());
+                        if (dpd != null && dpd.IsAttached)
+                        {
+                            string ownerName = property.OwnerType.Name;                            
+                            typeReference = new CodeTypeReferenceExpression(ownerName);
+                        }
+
                         CodeMethodInvokeExpression setBinding = new CodeMethodInvokeExpression(
                             target, "SetBinding", new CodeFieldReferenceExpression(typeReference, property.Name + "Property"), bindingVar);
                         method.Statements.Add(setBinding);                        

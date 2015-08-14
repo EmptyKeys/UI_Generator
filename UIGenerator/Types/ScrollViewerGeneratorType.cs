@@ -44,6 +44,9 @@ namespace EmptyKeys.UserInterface.Generator.Types
             ScrollViewer scrollViewer = source as ScrollViewer;
             CodeComHelper.GenerateEnumField<ScrollBarVisibility>(initMethod, fieldReference, source, ScrollViewer.HorizontalScrollBarVisibilityProperty);
             CodeComHelper.GenerateEnumField<ScrollBarVisibility>(initMethod, fieldReference, source, ScrollViewer.VerticalScrollBarVisibilityProperty);
+            CodeComHelper.GenerateEnumField<PanningMode>(initMethod, fieldReference, source, ScrollViewer.PanningModeProperty);
+            CodeComHelper.GenerateFieldDoubleToFloat(initMethod, fieldReference, source, ScrollViewer.PanningRatioProperty);
+            CodeComHelper.GenerateFieldDoubleToFloat(initMethod, fieldReference, source, ScrollViewer.PanningDecelerationProperty);
 
             return fieldReference;
         }

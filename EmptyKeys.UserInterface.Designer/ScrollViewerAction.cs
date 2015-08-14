@@ -34,6 +34,11 @@ namespace EmptyKeys.UserInterface.Designer
         /// <summary>
         /// The scroll to right
         /// </summary>
-        ScrollToRight
+        ScrollToRight,
+
+        /// <summary>
+        /// The scroll to point
+        /// </summary>
+        ScrollToPoint
     }
 }
