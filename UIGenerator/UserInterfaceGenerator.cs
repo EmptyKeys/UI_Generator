@@ -41,10 +41,16 @@ namespace EmptyKeys.UserInterface.Generator
         {
             inputFileContent = RemoveClass(inputFileContent);
 
+            // Ensure resources are located relative to the input file
+            var parserContext = new ParserContext
+            {
+                BaseUri = new Uri(inputFileName, UriKind.Absolute)
+            };
+
             object source = null;
             try
             {
-                source = XamlReader.Parse(inputFileContent);
+                source = XamlReader.Parse(inputFileContent, parserContext);
             }
             catch (Exception ex)
             {
