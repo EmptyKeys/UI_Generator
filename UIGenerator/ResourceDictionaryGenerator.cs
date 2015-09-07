@@ -29,23 +29,31 @@ namespace EmptyKeys.UserInterface.Generator
         {
             foreach (var mergedDict in dictionary.MergedDictionaries)
             {
+                string name = string.Empty;
                 if (mergedDict.Source.IsAbsoluteUri)
                 {
-                    string name = Path.GetFileNameWithoutExtension(mergedDict.Source.LocalPath);
-                    CodeMethodInvokeExpression addMergedDictionary = new CodeMethodInvokeExpression(
-                        fieldReference, "MergedDictionaries.Add", new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(name), "Instance"));
-                    initMethod.Statements.Add(addMergedDictionary);
+                    name = Path.GetFileNameWithoutExtension(mergedDict.Source.LocalPath);                    
                 }
                 else
                 {
-                    Console.WriteLine("Use absolute URI for merged dictionaries.");
+                    name = Path.GetFileNameWithoutExtension(mergedDict.Source.OriginalString);                    
                 }
+
+                if (string.IsNullOrEmpty(name))
+                {
+                    Console.WriteLine("Dictionary name not found.");
+                    continue;
+                }
+
+                CodeMethodInvokeExpression addMergedDictionary = new CodeMethodInvokeExpression(
+                        fieldReference, "MergedDictionaries.Add", new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(name), "Instance"));
+                initMethod.Statements.Add(addMergedDictionary);
             }
 
             ValueGenerator valueGenerator = new ValueGenerator();
             foreach (var resourceKey in dictionary.Keys)
-            {                
-                object resourceValue = dictionary[resourceKey];                               
+            {
+                object resourceValue = dictionary[resourceKey];
 
                 CodeComment comment = new CodeComment("Resource - [" + resourceKey.ToString() + "] " + resourceValue.GetType().Name);
                 initMethod.Statements.Add(new CodeCommentStatement(comment));
@@ -54,13 +62,13 @@ namespace EmptyKeys.UserInterface.Generator
                 CodeExpression valueExpression = valueGenerator.ProcessGenerators(classType, initMethod, resourceValue, "r_" + uniqueId, dictionary);
 
                 if (valueExpression != null)
-                {                    
+                {
                     CodeMethodInvokeExpression addResourceMethod = new CodeMethodInvokeExpression(fieldReference, "Add", keyExpression, valueExpression);
                     initMethod.Statements.Add(addResourceMethod);
                 }
 
                 uniqueId++;
             }
-        }                       
+        }
     }
 }

@@ -71,6 +71,7 @@ namespace EmptyKeys.UserInterface.Generator.Types.Controls
             CodeComHelper.GenerateFieldDoubleToFloat(method, fieldReference, source, DataGridColumn.MaxWidthProperty);
             CodeComHelper.GenerateFieldDoubleToFloat(method, fieldReference, source, DataGridColumn.MinWidthProperty);
             CodeComHelper.GenerateEnumField<Visibility>(method, fieldReference, source, DataGridColumn.VisibilityProperty);
+            CodeComHelper.GenerateField<string>(method, fieldReference, source, DataGridColumn.SortMemberPathProperty);
 
             UIElement header = column.Header as UIElement;
             if (header != null)

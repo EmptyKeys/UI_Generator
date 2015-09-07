@@ -25,7 +25,8 @@ namespace EmptyKeys.UserInterface.Generator
     {
         private readonly string memoryMappedFileName = "GenerationCodeMapppedFile";
         private readonly long nemoryMappedFileCapacity = 1000000;
-        private readonly string initMethodName = "InitializeComponent";
+        private readonly string initComponentsMethodName = "InitializeComponent";
+        private readonly string initMethodName = "Initialize";
 
         private TypeGenerator generator = new TypeGenerator();
 
@@ -41,7 +42,6 @@ namespace EmptyKeys.UserInterface.Generator
         {
             inputFileContent = RemoveClass(inputFileContent);
 
-            // Ensure resources are located relative to the input file
             var parserContext = new ParserContext
             {
                 BaseUri = new Uri(inputFileName, UriKind.Absolute)
@@ -50,7 +50,11 @@ namespace EmptyKeys.UserInterface.Generator
             object source = null;
             try
             {
-                source = XamlReader.Parse(inputFileContent, parserContext);
+                //source = XamlReader.Parse(inputFileContent); //, parserContext);
+                using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(inputFileContent)))
+                {
+                    source = XamlReader.Load(stream, parserContext);
+                }
             }
             catch (Exception ex)
             {
@@ -77,13 +81,13 @@ namespace EmptyKeys.UserInterface.Generator
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Data"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls.Primitives"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Input"));            
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Input"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Animation"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Imaging"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Shapes"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Renderers"));            
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));            
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Renderers"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));
 
             /*
             switch (renderMode)
@@ -98,7 +102,7 @@ namespace EmptyKeys.UserInterface.Generator
                 default:
                     break;
             }
-             */ 
+             */
 
             CodeTypeDeclaration classType = new CodeTypeDeclaration(className);
 
@@ -189,7 +193,7 @@ namespace EmptyKeys.UserInterface.Generator
             }
 
             return xml.OuterXml;
-        }        
+        }
 
         private CodeMemberMethod CreateDictionaryClass(CodeNamespace ns, CodeTypeDeclaration classType)
         {
@@ -249,13 +253,13 @@ namespace EmptyKeys.UserInterface.Generator
 
             CodeMethodInvokeExpression initMethodCall = new CodeMethodInvokeExpression(
                 new CodeThisReferenceExpression(),
-                initMethodName,
+                initComponentsMethodName,
                 new CodeExpression[] { });
             constructor.Statements.Add(initMethodCall);
             classType.Members.Add(constructor);
 
             CodeMemberMethod initMethod = new CodeMemberMethod();
-            initMethod.Name = initMethodName;
+            initMethod.Name = initComponentsMethodName;
             classType.Members.Add(initMethod);
 
             return initMethod;
@@ -267,49 +271,52 @@ namespace EmptyKeys.UserInterface.Generator
             classType.IsPartial = true;
             ns.Types.Add(classType);
 
-            CodeConstructor constructor = new CodeConstructor();
-            constructor.Attributes = MemberAttributes.Public;
-            constructor.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "width"));
-            constructor.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "height"));
-            constructor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("width"));
-            constructor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("height"));
-
-            /*
-            if (renderMode == RenderMode.MonoGame)
-            {
-                constructor.Parameters.Add(new CodeParameterDeclarationExpression("GraphicsDevice", "graphicsDevice"));
-                constructor.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "nativeScreenWidth"));
-                constructor.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "nativeScreenHeight"));
-
-                constructor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("graphicsDevice"));
-                constructor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("nativeScreenWidth"));
-                constructor.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("nativeScreenHeight"));
-            }
-            */
-
-            constructor.Statements.Add(new CodeVariableDeclarationStatement("Style", "style",
-                    new CodeMethodInvokeExpression(new CodeTypeReferenceExpression("RootStyle"), "CreateRootStyle")));
-
-            constructor.Statements.Add(new CodeAssignStatement(
-                new CodeFieldReferenceExpression(new CodeVariableReferenceExpression("style"), "TargetType"),
-                new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "GetType")));
-
-            constructor.Statements.Add(new CodeAssignStatement(
-                new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "Style"),
-                new CodeVariableReferenceExpression("style")));
-
             CodeMethodInvokeExpression initMethodCall = new CodeMethodInvokeExpression(
                 new CodeThisReferenceExpression(),
                 initMethodName,
                 new CodeExpression[] { });
+
+            CodeConstructor constructor = new CodeConstructor();
+            constructor.Attributes = MemberAttributes.Public;
+            constructor.BaseConstructorArgs.Add(new CodeSnippetExpression(string.Empty));
             constructor.Statements.Add(initMethodCall);
             classType.Members.Add(constructor);
+
+            CodeConstructor constructorWithParams = new CodeConstructor();
+            constructorWithParams.Attributes = MemberAttributes.Public;
+            constructorWithParams.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "width"));
+            constructorWithParams.Parameters.Add(new CodeParameterDeclarationExpression(typeof(int), "height"));
+            constructorWithParams.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("width"));
+            constructorWithParams.BaseConstructorArgs.Add(new CodeArgumentReferenceExpression("height"));
+            constructorWithParams.Statements.Add(initMethodCall);
+            classType.Members.Add(constructorWithParams);
 
             CodeMemberMethod initMethod = new CodeMemberMethod();
             initMethod.Name = initMethodName;
             classType.Members.Add(initMethod);
 
-            return initMethod;
+            initMethod.Statements.Add(new CodeVariableDeclarationStatement("Style", "style",
+                    new CodeMethodInvokeExpression(new CodeTypeReferenceExpression("RootStyle"), "CreateRootStyle")));
+
+            initMethod.Statements.Add(new CodeAssignStatement(
+                new CodeFieldReferenceExpression(new CodeVariableReferenceExpression("style"), "TargetType"),
+                new CodeMethodInvokeExpression(new CodeThisReferenceExpression(), "GetType")));
+
+            initMethod.Statements.Add(new CodeAssignStatement(
+                new CodeFieldReferenceExpression(new CodeThisReferenceExpression(), "Style"),
+                new CodeVariableReferenceExpression("style")));
+
+            CodeMethodInvokeExpression initComponentMethodCall = new CodeMethodInvokeExpression(
+                new CodeThisReferenceExpression(),
+                initComponentsMethodName,
+                new CodeExpression[] { });
+            initMethod.Statements.Add(initComponentMethodCall);
+
+            CodeMemberMethod initComponentsMethod = new CodeMemberMethod();
+            initComponentsMethod.Name = initComponentsMethodName;
+            classType.Members.Add(initComponentsMethod);
+
+            return initComponentsMethod;
         }
     }
 }

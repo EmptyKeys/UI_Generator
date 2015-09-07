@@ -72,6 +72,7 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("PanningRatio");
             supportedAttachedProperties.Add("PanningDeceleration");
             supportedAttachedProperties.Add("IsMouseWheelEnabled");
+            supportedAttachedProperties.Add("SortingCommand");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");
