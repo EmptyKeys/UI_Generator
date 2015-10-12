@@ -158,6 +158,9 @@ namespace EmptyKeys.UserInterface.Generator
             IGeneratorType pass = new PasswordBoxGeneratorType();
             Generators.Add(pass.XamlType, pass);
 
+            IGeneratorType customPassword = new CustomPasswordBoxGeneratorType();
+            Generators.Add(customPassword.XamlType, customPassword);
+
             IGeneratorType animImage = new AnimatedImageGeneratorType();
             Generators.Add(animImage.XamlType, animImage);
 
@@ -199,6 +202,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType tabPanel = new TabPanelGeneratorType();
             Generators.Add(tabPanel.XamlType, tabPanel);
+
+            IGeneratorType radio = new RadioButtonGeneratorType();
+            Generators.Add(radio.XamlType, radio);
         }
 
         /// <summary>

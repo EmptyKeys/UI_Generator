@@ -1,7 +1,6 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -11,9 +10,9 @@ using EmptyKeys.UserInterface.Designer;
 namespace EmptyKeys.UserInterface.Generator.Types
 {
     /// <summary>
-    /// Implements type generator for Numeric Text Box control
+    /// Implements Custom Password Box control generator with binding support for Password property
     /// </summary>
-    public class NumericTextBoxGeneratorType : TextBoxGeneratorType
+    public class CustomPasswordBoxGeneratorType : TextBoxGeneratorType
     {
         /// <summary>
         /// Gets the type of the xaml.
@@ -25,7 +24,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
         {
             get
             {
-                return typeof(NumericTextBox);
+                return typeof(PasswordBox);
             }
         }
 
@@ -41,13 +40,9 @@ namespace EmptyKeys.UserInterface.Generator.Types
         {
             CodeExpression fieldReference = base.Generate(source, classType, initMethod, generateField);
 
-            NumericTextBox numeric = source as NumericTextBox;
-            CodeComHelper.GenerateField<float>(initMethod, fieldReference, source, NumericTextBox.ValueProperty);
-            CodeComHelper.GenerateField<float>(initMethod, fieldReference, source, NumericTextBox.MinimumProperty);
-            CodeComHelper.GenerateField<float>(initMethod, fieldReference, source, NumericTextBox.MaximumProperty);
-            CodeComHelper.GenerateField<float>(initMethod, fieldReference, source, NumericTextBox.IncrementProperty);
-            CodeComHelper.GenerateField<string>(initMethod, fieldReference, source, NumericTextBox.ValueFormatProperty);
-            CodeComHelper.GenerateFlagEnumField<NumberStyles>(initMethod, fieldReference, source, NumericTextBox.ValueStyleProperty);
+            PasswordBox passBox = source as PasswordBox;
+            CodeComHelper.GenerateField<char>(initMethod, fieldReference, source, PasswordBox.PasswordCharProperty);
+            CodeComHelper.GenerateField<string>(initMethod, fieldReference, source, PasswordBox.PasswordProperty);
 
             return fieldReference;
         }

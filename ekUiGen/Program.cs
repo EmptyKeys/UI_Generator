@@ -15,7 +15,7 @@ namespace ekUiGen
         [STAThread]
         static int Main(string[] args)
         {
-            Console.WriteLine("Empty Keys (c) 2014 User Interface Generator Console v" + Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            Console.WriteLine("Empty Keys (c) 2015 User Interface Generator Console v" + Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             bool showHelp = false;
             bool IgnoreImageAssets = false;
@@ -26,6 +26,7 @@ namespace ekUiGen
             string assetInputDirectory = string.Empty;
             RenderMode renderMode = RenderMode.SunBurn;
             string desiredNamespace = string.Empty;
+            string buildDir = string.Empty;
 
             var optionSet = new OptionSet()
                 .Add("?|help|h", "Command line help", o => showHelp = o != null)
@@ -39,7 +40,8 @@ namespace ekUiGen
                 .Add<RenderMode>("rm=",
                     String.Format("Render mode ({0})", String.Join(", ", Enum.GetNames(typeof(RenderMode)))),
                     o => renderMode = o)
-                .Add<string>("ns|namespace=", "The namespace to generate the code under", o => desiredNamespace = o);
+                .Add<string>("ns|namespace=", "The namespace to generate the code under", o => desiredNamespace = o)
+                .Add<string>("bd|buildDir=", "Directory for additional assemblies", o => buildDir = o);
 
             try
             {
@@ -108,6 +110,12 @@ namespace ekUiGen
                 }
             }
 
+            if (!string.IsNullOrEmpty(buildDir))
+            {
+                Console.WriteLine("Copy of additional assemblies...");                
+                CopyDirectory(buildDir, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), true);
+            }
+
             foreach (var file in Directory.EnumerateFiles(inputDirectory, "*.xaml", SearchOption.AllDirectories))
             {
                 string relativeDirectory = file.Remove(0, inputDirectory.Length).TrimStart(Path.DirectorySeparatorChar);
@@ -170,6 +178,44 @@ namespace ekUiGen
         private static void ShowHelp(OptionSet optionSet)
         {
             optionSet.WriteOptionDescriptions(Console.Out);
+        }
+
+        private static void CopyDirectory(string sourceDirName, string destDirName, bool copySubDirs)
+        {
+            // Get the subdirectories for the specified directory.
+            DirectoryInfo dir = new DirectoryInfo(sourceDirName);
+
+            if (!dir.Exists)
+            {
+                throw new DirectoryNotFoundException(
+                    "Source directory does not exist or could not be found: "
+                    + sourceDirName);
+            }
+
+            DirectoryInfo[] dirs = dir.GetDirectories();
+            // If the destination directory doesn't exist, create it.
+            if (!Directory.Exists(destDirName))
+            {
+                Directory.CreateDirectory(destDirName);
+            }
+
+            // Get the files in the directory and copy them to the new location.
+            FileInfo[] files = dir.GetFiles();
+            foreach (FileInfo file in files)
+            {
+                string temppath = Path.Combine(destDirName, file.Name);
+                file.CopyTo(temppath, true);
+            }
+
+            // If copying subdirectories, copy them and their contents to new location.
+            if (copySubDirs)
+            {
+                foreach (DirectoryInfo subdir in dirs)
+                {
+                    string temppath = Path.Combine(destDirName, subdir.Name);
+                    CopyDirectory(subdir.FullName, temppath, copySubDirs);
+                }
+            }
         }
     }
 }

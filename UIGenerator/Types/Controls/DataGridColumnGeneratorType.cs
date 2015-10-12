@@ -60,12 +60,38 @@ namespace EmptyKeys.UserInterface.Generator.Types.Controls
             if (CodeComHelper.IsValidForFieldGenerator(source.ReadLocalValue(DataGridColumn.WidthProperty)))
             {
                 DataGridLength value = (DataGridLength)source.GetValue(DataGridColumn.WidthProperty);
-                if (value.UnitType == DataGridLengthUnitType.Pixel)
+                CodeTypeReferenceExpression dglType = new CodeTypeReferenceExpression("DataGridLength");
+
+                switch (value.UnitType)
                 {
-                    method.Statements.Add(new CodeAssignStatement(
-                        new CodeFieldReferenceExpression(fieldReference, DataGridColumn.WidthProperty.Name), 
-                        new CodePrimitiveExpression((float)value.Value)));
-                }
+                    case DataGridLengthUnitType.Auto:
+                        // AUTO is default value so we don't need to generate any code
+                        break;
+                    case DataGridLengthUnitType.Pixel:
+                        method.Statements.Add(new CodeAssignStatement(
+                            new CodeFieldReferenceExpression(fieldReference, DataGridColumn.WidthProperty.Name),
+                            new CodePrimitiveExpression((float)value.Value)));
+                        break;
+                    case DataGridLengthUnitType.SizeToCells:
+                        method.Statements.Add(new CodeAssignStatement(
+                            new CodeFieldReferenceExpression(fieldReference, DataGridColumn.WidthProperty.Name),                            
+                            new CodeFieldReferenceExpression(dglType, "SizeToCells")));
+                        break;
+                    case DataGridLengthUnitType.SizeToHeader:
+                        method.Statements.Add(new CodeAssignStatement(
+                            new CodeFieldReferenceExpression(fieldReference, DataGridColumn.WidthProperty.Name),
+                            new CodeFieldReferenceExpression(dglType, "SizeToHeader")));
+                        break;
+                    case DataGridLengthUnitType.Star:
+                        method.Statements.Add(new CodeAssignStatement(
+                            new CodeFieldReferenceExpression(fieldReference, DataGridColumn.WidthProperty.Name),
+                            new CodeObjectCreateExpression("DataGridLength", 
+                                new CodePrimitiveExpression(Convert.ToSingle(value.Value)),
+                                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression("DataGridLengthUnitType"), "Star"))));
+                        break;
+                    default:
+                        break;
+                }                
             }            
             
             CodeComHelper.GenerateFieldDoubleToFloat(method, fieldReference, source, DataGridColumn.MaxWidthProperty);

@@ -143,7 +143,45 @@ namespace EmptyKeys.UserInterface.Designer
         {
             get { return (float)GetValue(ValueProperty); }
             set { SetValue(ValueProperty, value); }
-        }        
+        }
+
+        /// <summary>
+        /// The value format property
+        /// </summary>
+        public static readonly DependencyProperty ValueFormatProperty =
+            DependencyProperty.Register("ValueFormat", typeof(string), typeOfThis,
+            new FrameworkPropertyMetadata("N"));
+
+        /// <summary>
+        /// Gets or sets the value format.
+        /// </summary>
+        /// <value>
+        /// The value format.
+        /// </value>
+        public string ValueFormat
+        {
+            get { return (string)GetValue(ValueFormatProperty); }
+            set { SetValue(ValueFormatProperty, value); }
+        }
+
+        /// <summary>
+        /// The value style property
+        /// </summary>
+        public static readonly DependencyProperty ValueStyleProperty =
+            DependencyProperty.Register("ValueStyle", typeof(NumberStyles), typeOfThis,
+            new FrameworkPropertyMetadata(NumberStyles.Number));
+
+        /// <summary>
+        /// Gets or sets the value style.
+        /// </summary>
+        /// <value>
+        /// The value style.
+        /// </value>
+        public NumberStyles ValueStyle
+        {
+            get { return (NumberStyles)GetValue(ValueStyleProperty); }
+            set { SetValue(ValueStyleProperty, value); }
+        }
 
         /// <summary>
         /// The increment property

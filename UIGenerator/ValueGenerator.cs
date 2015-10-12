@@ -129,6 +129,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorValue fontFamily = new FontFamilyGeneratorValue();
             Generators.Add(fontFamily.ValueType, fontFamily);
+
+            IGeneratorValue fontWeight = new FontWeightGeneratorValue();
+            Generators.Add(fontWeight.ValueType, fontWeight);
         }
 
         /// <summary>

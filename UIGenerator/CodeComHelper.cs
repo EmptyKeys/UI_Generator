@@ -66,13 +66,15 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("HorizontalOffset");
             supportedAttachedProperties.Add("IsDragSource");
             supportedAttachedProperties.Add("IsDropTarget");
-            supportedAttachedProperties.Add("CommandPath");
+            supportedAttachedProperties.Add("Command");
+            supportedAttachedProperties.Add("CommandPath");            
             supportedAttachedProperties.Add("CommandParameter");
             supportedAttachedProperties.Add("PanningMode");
             supportedAttachedProperties.Add("PanningRatio");
             supportedAttachedProperties.Add("PanningDeceleration");
             supportedAttachedProperties.Add("IsMouseWheelEnabled");
             supportedAttachedProperties.Add("SortingCommand");
+            supportedAttachedProperties.Add("IsSoundEnabled");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");
@@ -97,13 +99,40 @@ namespace EmptyKeys.UserInterface.Generator
                 T value = (T)source.GetValue(property);
                 GenerateEnumField(method, target, property.Name, typeof(T).Name, value.ToString());
             }
-        }
+        }        
 
-        private static void GenerateEnumField(CodeMemberMethod method, CodeExpression target, string fieldName, string typeName, string value)
+        /// <summary>
+        /// Generates the enum field.
+        /// </summary>
+        /// <param name="method">The method.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="fieldName">Name of the field.</param>
+        /// <param name="typeName">Name of the type.</param>
+        /// <param name="value">The value.</param>
+        public static void GenerateEnumField(CodeMemberMethod method, CodeExpression target, string fieldName, string typeName, string value)
         {
             CodeFieldReferenceExpression fieldReference = new CodeFieldReferenceExpression(target, fieldName);
             CodeTypeReferenceExpression typeReference = new CodeTypeReferenceExpression(typeName);
             method.Statements.Add(new CodeAssignStatement(fieldReference, new CodeFieldReferenceExpression(typeReference, value)));
+        }
+
+        /// <summary>
+        /// Generates the flag enum field.
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="method">The method.</param>
+        /// <param name="target">The target.</param>
+        /// <param name="source">The source.</param>
+        /// <param name="property">The property.</param>
+        public static void GenerateFlagEnumField<T>(CodeMemberMethod method, CodeExpression target, DependencyObject source, DependencyProperty property)
+        {
+            if (IsValidForFieldGenerator(source.ReadLocalValue(property)))
+            {
+                T value = (T)source.GetValue(property);
+                CodeFieldReferenceExpression fieldReference = new CodeFieldReferenceExpression(target, property.Name);
+                CodeCastExpression castExpression = new CodeCastExpression(typeof(T), new CodePrimitiveExpression(Convert.ToInt32(value)));
+                method.Statements.Add(new CodeAssignStatement(fieldReference, castExpression));
+            }
         }
 
         /// <summary>
@@ -1159,13 +1188,21 @@ namespace EmptyKeys.UserInterface.Generator
                     }                    
                 }
 
+                string propertyName = setter.Property.Name;
+                if (setter.Property == Control.FontWeightProperty)
+                {
+                    // Empty Keys UI does not have FontWeight, only FontStyle
+                    propertyName = "FontStyle";
+                }
+
                 CodeVariableDeclarationStatement setterVar =
                     new CodeVariableDeclarationStatement("Setter", setterVarName,
                         new CodeObjectCreateExpression(
                             "Setter",
-                            new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(targetType.Name), setter.Property.Name + "Property"),
+                            new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(targetType.Name), propertyName + "Property"),
                             setterValueExpr
                             ));
+
                 method.Statements.Add(setterVar);
 
                 if (!string.IsNullOrEmpty(setter.TargetName))
@@ -1248,7 +1285,8 @@ namespace EmptyKeys.UserInterface.Generator
                 }
             }
 
-            GenerateAttachedProperties(method, triggerVarRef, trigger, typeName);            
+            GenerateAttachedProperties(method, triggerVarRef, trigger, typeName);
+            GenerateBindings(method, triggerVarRef, trigger, typeName);
         }
 
         private static void GenerateStoryboard(CodeTypeDeclaration classType, CodeMemberMethod method, Storyboard storyboard, string actionName, string typeName)

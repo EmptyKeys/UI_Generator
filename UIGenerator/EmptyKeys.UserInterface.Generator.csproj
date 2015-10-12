@@ -74,12 +74,14 @@
     <Compile Include="Types\Controls\HeaderedItemsControlGeneratorType.cs" />
     <Compile Include="Types\Controls\Primitives\PopupGeneratorType.cs" />
     <Compile Include="Types\Controls\Primitives\TabPanelGeneratorType.cs" />
+    <Compile Include="Types\Controls\RadioButtonGeneratorType.cs" />
     <Compile Include="Types\Controls\TreeViewGeneratorType.cs" />
     <Compile Include="Types\Controls\TreeViewItemGeneratorType.cs" />
     <Compile Include="Types\Controls\WrapPanelGeneratorType.cs" />
     <Compile Include="Types\CustomUserControlGeneratorType.cs" />
     <Compile Include="Types\AnimatedImageGeneratorType.cs" />
     <Compile Include="Types\NumericTextBoxGeneratorType.cs" />
+    <Compile Include="Types\CustomPasswordBoxGeneratorType.cs" />
     <Compile Include="Types\PasswordBoxGeneratorType.cs" />
     <Compile Include="Types\Shapes\LineGeneratorType.cs" />
     <Compile Include="Types\Shapes\PathGeneratorType.cs" />
@@ -135,6 +137,7 @@
     <Compile Include="Values\RectangleGeometryGeneratorValue.cs" />
     <Compile Include="Values\SolidColorBrushAnimGeneratorValue.cs" />
     <Compile Include="Values\ThicknessAnimationGeneratorValue.cs" />
+    <Compile Include="Values\FontWeightGeneratorValue.cs" />
     <Compile Include="Values\ThicknessGeneratorValue.cs" />
     <Compile Include="Values\SoundSourceGeneratorValue.cs" />
     <Compile Include="Values\StyleGeneratorValue.cs" />

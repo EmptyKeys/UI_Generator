@@ -44,13 +44,12 @@ namespace EmptyKeys.UserInterface.Generator
 
             var parserContext = new ParserContext
             {
-                BaseUri = new Uri(inputFileName, UriKind.Absolute)
-            };
-
+                BaseUri = new Uri(inputFileName, UriKind.Absolute)                
+            };            
+            
             object source = null;
             try
-            {
-                //source = XamlReader.Parse(inputFileContent); //, parserContext);
+            {                
                 using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(inputFileContent)))
                 {
                     source = XamlReader.Load(stream, parserContext);
@@ -87,22 +86,7 @@ namespace EmptyKeys.UserInterface.Generator
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Imaging"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Shapes"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Renderers"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));
-
-            /*
-            switch (renderMode)
-            {
-                case RenderMode.SunBurn:
-                    ns.Imports.Add(new CodeNamespaceImport("SynapseGaming.SunBurn.Framework.Primitives"));
-                    break;
-                case RenderMode.MonoGame:
-                    ns.Imports.Add(new CodeNamespaceImport("Microsoft.Xna.Framework"));
-                    ns.Imports.Add(new CodeNamespaceImport("Microsoft.Xna.Framework.Graphics"));
-                    break;
-                default:
-                    break;
-            }
-             */
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));           
 
             CodeTypeDeclaration classType = new CodeTypeDeclaration(className);
 

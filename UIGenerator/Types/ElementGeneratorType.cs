@@ -103,6 +103,12 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateToolTipField(classType, method, fieldReference, source, FrameworkElement.ToolTipProperty);
             CodeComHelper.GenerateFieldDoubleToFloat(method, fieldReference, source, FrameworkElement.OpacityProperty);
 
+            if (element.Cursor != null)
+            {
+                CursorType cursorType = (CursorType) Enum.Parse(typeof(CursorType), element.Cursor.ToString());
+                CodeComHelper.GenerateEnumField(method, fieldReference, "CursorType", typeof(CursorType).Name, cursorType.ToString());
+            }
+
             if (element.Triggers.Count > 0)
             {
                 string parentName = element.Name;

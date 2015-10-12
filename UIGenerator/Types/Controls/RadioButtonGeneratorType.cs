@@ -1,19 +1,18 @@
 ﻿using System;
 using System.CodeDom;
 using System.Collections.Generic;
-using System.Globalization;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using EmptyKeys.UserInterface.Designer;
+using System.Windows.Controls;
 
-namespace EmptyKeys.UserInterface.Generator.Types
+namespace EmptyKeys.UserInterface.Generator.Types.Controls
 {
     /// <summary>
-    /// Implements type generator for Numeric Text Box control
+    /// Implements Radio Button control generator
     /// </summary>
-    public class NumericTextBoxGeneratorType : TextBoxGeneratorType
+    public class RadioButtonGeneratorType : ToggleButtonGeneratorType
     {
         /// <summary>
         /// Gets the type of the xaml.
@@ -25,7 +24,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
         {
             get
             {
-                return typeof(NumericTextBox);
+                return typeof(RadioButton);
             }
         }
 
@@ -41,13 +40,8 @@ namespace EmptyKeys.UserInterface.Generator.Types
         {
             CodeExpression fieldReference = base.Generate(source, classType, initMethod, generateField);
 
-            NumericTextBox numeric = source as NumericTextBox;
-            CodeComHelper.GenerateField<float>(initMethod, fieldReference, source, NumericTextBox.ValueProperty);
-            CodeComHelper.GenerateField<float>(initMethod, fieldReference, source, NumericTextBox.MinimumProperty);
-            CodeComHelper.GenerateField<float>(initMethod, fieldReference, source, NumericTextBox.MaximumProperty);
-            CodeComHelper.GenerateField<float>(initMethod, fieldReference, source, NumericTextBox.IncrementProperty);
-            CodeComHelper.GenerateField<string>(initMethod, fieldReference, source, NumericTextBox.ValueFormatProperty);
-            CodeComHelper.GenerateFlagEnumField<NumberStyles>(initMethod, fieldReference, source, NumericTextBox.ValueStyleProperty);
+            RadioButton radio = source as RadioButton;
+            CodeComHelper.GenerateField<string>(initMethod, fieldReference, source, RadioButton.GroupNameProperty);            
 
             return fieldReference;
         }

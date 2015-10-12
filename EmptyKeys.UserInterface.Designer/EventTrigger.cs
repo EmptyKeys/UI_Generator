@@ -14,6 +14,33 @@ namespace EmptyKeys.UserInterface.Designer
     public static class EventTrigger
     {
         /// <summary>
+        /// Gets the command.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <returns></returns>
+        public static ICommand GetCommand(DependencyObject obj)
+        {
+            return (ICommand)obj.GetValue(CommandProperty);
+        }
+
+        /// <summary>
+        /// Sets the command.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="value">The value.</param>
+        public static void SetCommand(DependencyObject obj, ICommand value)
+        {
+            obj.SetValue(CommandProperty, value);
+        }
+
+        /// <summary>
+        /// The command path property
+        /// </summary>
+        public static readonly DependencyProperty CommandProperty =
+            DependencyProperty.RegisterAttached("Command", typeof(ICommand), typeof(EventTrigger),
+            new FrameworkPropertyMetadata(null));
+
+        /// <summary>
         /// Gets the command path.
         /// </summary>
         /// <param name="obj">The object.</param>
@@ -37,8 +64,8 @@ namespace EmptyKeys.UserInterface.Designer
         /// The command path property
         /// </summary>
         public static readonly DependencyProperty CommandPathProperty =
-            DependencyProperty.RegisterAttached("CommandPath", typeof(string), typeof(EventTrigger), 
-            new FrameworkPropertyMetadata(null));        
+            DependencyProperty.RegisterAttached("CommandPath", typeof(string), typeof(EventTrigger),
+            new FrameworkPropertyMetadata(null));
 
         /// <summary>
         /// Gets the command parameter.

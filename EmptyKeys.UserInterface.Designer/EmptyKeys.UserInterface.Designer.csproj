@@ -69,6 +69,7 @@
     <Compile Include="Input\GamepadGesture.cs" />
     <Compile Include="Input\GamepadInput.cs" />
     <Compile Include="NumericTextBox.cs" />
+    <Compile Include="PasswordBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
       <SubType>Code</SubType>
     </Compile>
