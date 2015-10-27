@@ -9,8 +9,8 @@
 
   <Target Name="BeforeCompile">
     <Error Condition=" '$(EmptyKeysDir)' == '' "
-	       Text="Empty Keys directory not set!"
-		   File="$(MSBuildProjectFile)"/>
+           Text="Empty Keys directory not set!"
+           File="$(MSBuildProjectFile)"/>
 
     <MakeDir Directories="$(EmptyKeysDir)"/>
     <!-- Execution requires explicit version, as wildcard reference fails in Windows shell -->
