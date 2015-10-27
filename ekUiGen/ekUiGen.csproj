@@ -58,6 +58,7 @@
     <None Include="EmptyKeys.UserInterface.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </None>
+    <None Include="New EmptyKeys UI.zip" />
     <None Include="packages.config" />
     <Content Include="SpriteFontTemplate.pdxfnt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>

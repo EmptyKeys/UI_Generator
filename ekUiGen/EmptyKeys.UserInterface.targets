@@ -3,15 +3,16 @@
 -->
 
 <Project>
-  <EmptyKeysDir Condition=" '$(EmptyKeysDir)' == '' ">
-    $(ProjectDir)UI\Views
-  </EmptyKeysDir>
+  <PropertyGroup>
+    <EmptyKeysDir Condition=" '$(EmptyKeysDir)' == '' ">$(ProjectDir)UI\Views</EmptyKeysDir>
+  </PropertyGroup>
 
   <Target Name="BeforeCompile">
     <Error Condition=" '$(EmptyKeysDir)' == '' "
 	       Text="Empty Keys directory not set!"
 		   File="$(MSBuildProjectFile)"/>
-		   
+
+    <MakeDir Directories="$(EmptyKeysDir)"/>
     <!-- Execution requires explicit version, as wildcard reference fails in Windows shell -->
     <Exec Command="&quot;$(SolutionDir)packages\EmptyKeysUI_Generator.1.10.0.0\tools\ekuigen&quot; -i=&quot;$(EmptyKeysDir)&quot; -o=&quot;$(EmptyKeysDir)&quot;"/>
   </Target>
