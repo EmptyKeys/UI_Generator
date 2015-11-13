@@ -69,7 +69,14 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateEnumField<TextAlignment>(method, fieldReference, source, TextBlock.TextAlignmentProperty);
             CodeComHelper.GenerateEnumField<TextWrapping>(method, fieldReference, source, TextBlock.TextWrappingProperty);
 
-            FontGenerator.Instance.AddFont(textBlock.FontFamily, textBlock.FontSize, textBlock.FontStyle, textBlock.FontWeight, method);
+            if (!CodeComHelper.IsDefaultValue(source, TextBlock.FontFamilyProperty) ||
+                !CodeComHelper.IsDefaultValue(source, TextBlock.FontSizeProperty) ||
+                !CodeComHelper.IsDefaultValue(source, TextBlock.FontStyleProperty) ||
+                !CodeComHelper.IsDefaultValue(source, TextBlock.FontWeightProperty))
+            {
+                FontGenerator.Instance.AddFont(textBlock.FontFamily, textBlock.FontSize, textBlock.FontStyle, textBlock.FontWeight, method);
+            }
+            
             CodeComHelper.GenerateFontFamilyField(method, fieldReference, source, TextBlock.FontFamilyProperty);
             CodeComHelper.GenerateFieldDoubleToFloat(method, fieldReference, source, TextBlock.FontSizeProperty);
             CodeComHelper.GenerateFontStyleField(method, fieldReference, source, TextBlock.FontStyleProperty, TextBlock.FontWeightProperty);

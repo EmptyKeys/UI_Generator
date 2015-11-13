@@ -54,7 +54,14 @@ namespace EmptyKeys.UserInterface.Generator.Types
 
             CodeComHelper.GenerateTemplateStyleField(classType, method, fieldReference, source, Control.TemplateProperty);
 
-            FontGenerator.Instance.AddFont(control.FontFamily, control.FontSize, control.FontStyle, control.FontWeight, method);
+            if (!CodeComHelper.IsDefaultValue(source, Control.FontFamilyProperty) ||
+                !CodeComHelper.IsDefaultValue(source, Control.FontSizeProperty) ||
+                !CodeComHelper.IsDefaultValue(source, Control.FontStyleProperty) ||
+                !CodeComHelper.IsDefaultValue(source, Control.FontWeightProperty))
+            {
+                FontGenerator.Instance.AddFont(control.FontFamily, control.FontSize, control.FontStyle, control.FontWeight, method);
+            }
+
             CodeComHelper.GenerateFontFamilyField(method, fieldReference, source, Control.FontFamilyProperty);
             CodeComHelper.GenerateFieldDoubleToFloat(method, fieldReference, source, Control.FontSizeProperty);
             CodeComHelper.GenerateFontStyleField(method, fieldReference, source, Control.FontStyleProperty, Control.FontWeightProperty);

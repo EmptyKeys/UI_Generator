@@ -62,6 +62,10 @@
     </Compile>
     <Compile Include="AnimatedImageBrush.cs" />
     <Compile Include="AnimatedImage.cs" />
+    <Compile Include="Charts\Chart.cs" />
+    <Compile Include="Charts\LineSeries2D.cs" />
+    <Compile Include="Charts\SeriesPoint.cs" />
+    <Compile Include="Charts\SeriesPointCollection.cs" />
     <Compile Include="DataGrid.cs" />
     <Compile Include="DragDrop.cs" />
     <Compile Include="EventTrigger.cs" />

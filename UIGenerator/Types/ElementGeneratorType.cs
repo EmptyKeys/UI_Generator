@@ -17,7 +17,10 @@ namespace EmptyKeys.UserInterface.Generator.Types
     /// </summary>
     public class ElementGeneratorType : IGeneratorType
     {
-        private static int nameUniqueId;
+        /// <summary>
+        /// The name unique identifier
+        /// </summary>
+        public static int NameUniqueId;
 
         /// <summary>
         /// Gets the type of the xaml.
@@ -55,8 +58,8 @@ namespace EmptyKeys.UserInterface.Generator.Types
 
             if (string.IsNullOrEmpty(element.Name))
             {
-                element.Name = "e_" + nameUniqueId;
-                nameUniqueId++;
+                element.Name = "e_" + NameUniqueId;
+                NameUniqueId++;
             }
 
             if (generateField)

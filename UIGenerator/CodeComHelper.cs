@@ -67,7 +67,7 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("IsDragSource");
             supportedAttachedProperties.Add("IsDropTarget");
             supportedAttachedProperties.Add("Command");
-            supportedAttachedProperties.Add("CommandPath");            
+            supportedAttachedProperties.Add("CommandPath");
             supportedAttachedProperties.Add("CommandParameter");
             supportedAttachedProperties.Add("PanningMode");
             supportedAttachedProperties.Add("PanningRatio");
@@ -99,7 +99,7 @@ namespace EmptyKeys.UserInterface.Generator
                 T value = (T)source.GetValue(property);
                 GenerateEnumField(method, target, property.Name, typeof(T).Name, value.ToString());
             }
-        }        
+        }
 
         /// <summary>
         /// Generates the enum field.
@@ -419,7 +419,7 @@ namespace EmptyKeys.UserInterface.Generator
                     new CodePrimitiveExpression(solid.Color.G),
                     new CodePrimitiveExpression(solid.Color.B),
                     new CodePrimitiveExpression(solid.Color.A));
-                brushExpr = new CodeObjectCreateExpression(brushTypeName, colorExpr);                
+                brushExpr = new CodeObjectCreateExpression(brushTypeName, colorExpr);
                 return brushExpr;
             }
 
@@ -443,7 +443,7 @@ namespace EmptyKeys.UserInterface.Generator
                     new CodeObjectCreateExpression("PointF",
                         new CodePrimitiveExpression((float)linear.EndPoint.X),
                         new CodePrimitiveExpression((float)linear.EndPoint.Y))));
-                
+
                 var spread = linear.SpreadMethod;
                 CodeTypeReferenceExpression enumType = new CodeTypeReferenceExpression(spread.GetType().Name);
                 method.Statements.Add(new CodeAssignStatement(
@@ -463,16 +463,16 @@ namespace EmptyKeys.UserInterface.Generator
                                 new CodePrimitiveExpression((float)stop.Offset)));
                     method.Statements.Add(gradientStop);
                 }
-                
+
                 return brushExpr;
             }
 
             ImageBrush image = brush as ImageBrush;
             if (image != null)
             {
-                brushExpr = GenerateImageBrush(method, variableName, brushTypeName, brushExpr, image);                
+                brushExpr = GenerateImageBrush(method, variableName, brushTypeName, brushExpr, image);
                 return brushExpr;
-            }            
+            }
 
             GenerateError(method, "Brush type not supported - " + brush.GetType());
 
@@ -571,7 +571,7 @@ namespace EmptyKeys.UserInterface.Generator
 
             method.Statements.Add(new CodeAssignStatement(
                 new CodeFieldReferenceExpression(new CodeVariableReferenceExpression(variableName), "TextureAsset"),
-                new CodePrimitiveExpression(imageAsset)));            
+                new CodePrimitiveExpression(imageAsset)));
 
             ImageAssets.Instance.AddImage(imageAsset, extension);
 
@@ -664,12 +664,13 @@ namespace EmptyKeys.UserInterface.Generator
                 if (BindingOperations.IsDataBound(source, property) || entry.Value is TemplateBindingExpression)
                 {
                     BindingExpression commandBindingExpr = entry.Value as BindingExpression;
+                    TemplateBindingExpression templateBinding = entry.Value as TemplateBindingExpression;
                     if (commandBindingExpr != null)
                     {
                         Binding binding = commandBindingExpr.ParentBinding;
                         string varName = string.Format("{0}_{1}_{2}", "binding", sourceName, property.Name);
 
-                        CodeVariableReferenceExpression bindingVar = GenerateBinding(method, binding, varName);                      
+                        CodeVariableReferenceExpression bindingVar = GenerateBinding(method, binding, varName);
 
                         if (setBindingSource && bindingSource != null)
                         {
@@ -693,17 +694,15 @@ namespace EmptyKeys.UserInterface.Generator
                         DependencyPropertyDescriptor dpd = DependencyPropertyDescriptor.FromProperty(property, source.GetType());
                         if (dpd != null && dpd.IsAttached)
                         {
-                            string ownerName = property.OwnerType.Name;                            
+                            string ownerName = property.OwnerType.Name;
                             typeReference = new CodeTypeReferenceExpression(ownerName);
                         }
 
                         CodeMethodInvokeExpression setBinding = new CodeMethodInvokeExpression(
                             target, "SetBinding", new CodeFieldReferenceExpression(typeReference, property.Name + "Property"), bindingVar);
-                        method.Statements.Add(setBinding);                        
+                        method.Statements.Add(setBinding);
                     }
-
-                    TemplateBindingExpression templateBinding = entry.Value as TemplateBindingExpression;
-                    if (templateBinding != null)
+                    else if (templateBinding != null)
                     {
                         CodeVariableReferenceExpression bindingVar = new CodeVariableReferenceExpression(string.Format("{0}_{1}_{2}", "binding", sourceName, property.Name));
                         CodeTypeReference bindingClassRef = new CodeTypeReference("Binding");
@@ -719,6 +718,10 @@ namespace EmptyKeys.UserInterface.Generator
                         CodeMethodInvokeExpression setBinding = new CodeMethodInvokeExpression(
                             target, "SetBinding", new CodeFieldReferenceExpression(typeReference, property.Name + "Property"), bindingVar);
                         method.Statements.Add(setBinding);
+                    }
+                    else
+                    {
+                        GenerateError(method, string.Format("Type {0} is not supported", entry.Value.GetType()));
                     }
                 }
             }
@@ -893,7 +896,7 @@ namespace EmptyKeys.UserInterface.Generator
                         }
                         else if (value.GetType().IsEnum)
                         {
-                            CodeTypeReferenceExpression enumType = new CodeTypeReferenceExpression(value.GetType().Name);      
+                            CodeTypeReferenceExpression enumType = new CodeTypeReferenceExpression(value.GetType().Name);
                             CodeMethodInvokeExpression setValue = new CodeMethodInvokeExpression(
                                 typeReference, "Set" + property.Name, target,
                                 new CodeFieldReferenceExpression(enumType, value.ToString()));
@@ -975,7 +978,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="property">The property.</param>
         public static void GenerateTemplateStyleField(CodeTypeDeclaration parentClass, CodeMemberMethod method, CodeExpression target, DependencyObject source, DependencyProperty property)
         {
-            GenerateTemplateStyleField(parentClass, method, target, source, property, ((FrameworkElement)source).Name);            
+            GenerateTemplateStyleField(parentClass, method, target, source, property, ((FrameworkElement)source).Name);
         }
 
         /// <summary>
@@ -1062,13 +1065,13 @@ namespace EmptyKeys.UserInterface.Generator
                 return string.Empty;
             }
 
-            classType.Members.Add(initTemplateMethod);            
+            classType.Members.Add(initTemplateMethod);
             CodeVariableDeclarationStatement firstStatement = initTemplateMethod.Statements[1] as CodeVariableDeclarationStatement;
             initTemplateMethod.Statements.Insert(2, new CodeAssignStatement(
                 new CodeFieldReferenceExpression(
                     new CodeVariableReferenceExpression(firstStatement.Name), "Parent"), new CodeVariableReferenceExpression("parent")));
 
-            string creator = templateVariableName + "Func";            
+            string creator = templateVariableName + "Func";
             initMethod.Statements.Add(new CodeSnippetStatement(string.Format("            Func<UIElement, UIElement> {0} = {1};", creator, initTemplateMethod.Name)));
 
             CodeMethodReturnStatement returnInitTemplateMethod = new CodeMethodReturnStatement(new CodeVariableReferenceExpression(firstStatement.Name));
@@ -1185,7 +1188,7 @@ namespace EmptyKeys.UserInterface.Generator
                     if (targetType == typeof(TextElement))
                     {
                         targetType = typeof(TextBlock);
-                    }                    
+                    }
                 }
 
                 string propertyName = setter.Property.Name;
@@ -1442,6 +1445,18 @@ namespace EmptyKeys.UserInterface.Generator
                         new CodePrimitiveExpression(value.Y))
                     ));
             }
+        }
+
+        /// <summary>
+        /// Determines whether [is default value] [the specified source].
+        /// </summary>
+        /// <param name="source">The source.</param>
+        /// <param name="property">The property.</param>
+        /// <returns></returns>
+        public static bool IsDefaultValue(DependencyObject source, DependencyProperty property)
+        {
+            object value = source.GetValue(property);
+            return value == DependencyProperty.UnsetValue || (value != null && value.Equals(property.DefaultMetadata.DefaultValue));
         }
     }
 }

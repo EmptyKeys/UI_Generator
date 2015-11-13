@@ -15,6 +15,7 @@ using System.Windows.Data;
 using System.Windows.Markup;
 using System.Xml;
 using EmptyKeys.UserInterface.Designer;
+using EmptyKeys.UserInterface.Generator.Types;
 
 namespace EmptyKeys.UserInterface.Generator
 {
@@ -49,7 +50,7 @@ namespace EmptyKeys.UserInterface.Generator
             
             object source = null;
             try
-            {                
+            {
                 using (Stream stream = new MemoryStream(Encoding.UTF8.GetBytes(inputFileContent)))
                 {
                     source = XamlReader.Load(stream, parserContext);
@@ -64,11 +65,12 @@ namespace EmptyKeys.UserInterface.Generator
             if (source == null)
             {
                 return "Source is empty. XAML file is not valid.";
-            }
+            }            
 
             Console.WriteLine();
             Console.WriteLine("Generating " + inputFileName);
 
+            ElementGeneratorType.NameUniqueId = 0;
             string resultCode = string.Empty;
             string className = Path.GetFileNameWithoutExtension(inputFileName);
 
@@ -77,6 +79,7 @@ namespace EmptyKeys.UserInterface.Generator
             ns.Imports.Add(new CodeNamespaceImport("System.CodeDom.Compiler"));
             ns.Imports.Add(new CodeNamespaceImport("System.Collections.ObjectModel"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Charts"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Data"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls.Primitives"));

@@ -8,6 +8,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using EmptyKeys.UserInterface.Generator.Types;
+using EmptyKeys.UserInterface.Generator.Types.Charts;
 using EmptyKeys.UserInterface.Generator.Types.Controls;
 using EmptyKeys.UserInterface.Generator.Types.Controls.Primitives;
 using EmptyKeys.UserInterface.Generator.Types.Shapes;
@@ -205,6 +206,18 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType radio = new RadioButtonGeneratorType();
             Generators.Add(radio.XamlType, radio);
+
+            IGeneratorType groupBox = new GroupBoxGeneratorType();
+            Generators.Add(groupBox.XamlType, groupBox);
+
+            IGeneratorType chart = new ChartGeneratorType();
+            Generators.Add(chart.XamlType, chart);
+
+            IGeneratorType series = new LineSeries2DGeneratorType();
+            Generators.Add(series.XamlType, series);
+
+            IGeneratorType seriesPoint = new SeriesPointGeneratorType();
+            Generators.Add(seriesPoint.XamlType, seriesPoint);
         }
 
         /// <summary>

@@ -167,11 +167,22 @@ namespace ekUiGen
             }
 
             UserInterfaceGenerator generator = new UserInterfaceGenerator();
-            string generatedCode = generator.GenerateCode(xamlFile, xaml, renderMode, desiredNamespace);
-
-            using (StreamWriter outfile = new StreamWriter(outputFile))
+            string generatedCode = string.Empty;
+            try
             {
-                outfile.Write(generatedCode);
+                generatedCode = generator.GenerateCode(xamlFile, xaml, renderMode, desiredNamespace);
+            }
+            catch (Exception ex)
+            {
+                generatedCode = "#error " + ex.Message;
+                throw;
+            }
+            finally
+            {
+                using (StreamWriter outfile = new StreamWriter(outputFile))
+                {
+                    outfile.Write(generatedCode);
+                }
             }
         }
 

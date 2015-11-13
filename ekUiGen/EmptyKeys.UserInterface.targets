@@ -14,6 +14,6 @@
 
     <MakeDir Directories="$(EmptyKeysDir)"/>
     <!-- Execution requires explicit version, as wildcard reference fails in Windows shell -->
-    <Exec Command="&quot;$(SolutionDir)packages\EmptyKeysUI_Generator.1.10.0.0\tools\ekuigen&quot; -i=&quot;$(EmptyKeysDir)&quot; -o=&quot;$(EmptyKeysDir)&quot;"/>
+    <Exec Command="&quot;$(SolutionDir)packages\EmptyKeysUI_Generator.1.11.0.0\tools\ekuigen&quot; -i=&quot;$(EmptyKeysDir)&quot; -o=&quot;$(EmptyKeysDir)&quot;"/>
   </Target>
 </Project>

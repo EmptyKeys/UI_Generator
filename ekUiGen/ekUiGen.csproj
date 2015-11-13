@@ -30,7 +30,7 @@
     <PlatformTarget>AnyCPU</PlatformTarget>
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
-    <OutputPath>bin\Release\</OutputPath>
+    <OutputPath>..\..\!Release\EmptyKeysUI\Generator\</OutputPath>
     <DefineConstants>TRACE</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
@@ -55,12 +55,12 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
-    <None Include="EmptyKeys.UserInterface.targets">
+    <Content Include="EmptyKeys.UserInterface.targets">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
-    <None Include="New EmptyKeys UI.zip">
+    </Content>
+    <Content Include="New EmptyKeys UI.zip">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </None>
+    </Content>
     <None Include="packages.config" />
     <Content Include="SpriteFontTemplate.pdxfnt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
