@@ -2,7 +2,7 @@
   EmptyKeys UI Generator Targets file
 -->
 
-<Project>
+<Project xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <PropertyGroup>
     <EmptyKeysDir Condition=" '$(EmptyKeysDir)' == '' ">$(ProjectDir)UI\Views</EmptyKeysDir>
   </PropertyGroup>
