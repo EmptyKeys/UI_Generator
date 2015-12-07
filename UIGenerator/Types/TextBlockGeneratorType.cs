@@ -58,7 +58,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
                     }
                 }
 
-                CodeComHelper.GenerateField(method, fieldReference, "Text", text.ToString());
+                CodeComHelper.GenerateFieldNonGeneric(method, fieldReference, "Text", text.ToString());
             }
             else
             {

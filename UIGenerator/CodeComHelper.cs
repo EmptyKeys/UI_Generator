@@ -17,6 +17,7 @@ using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
 using EmptyKeys.UserInterface.Designer;
+using EmptyKeys.UserInterface.Designer.Interactions;
 
 namespace EmptyKeys.UserInterface.Generator
 {
@@ -175,7 +176,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="target">The target.</param>
         /// <param name="fieldName">Name of the field.</param>
         /// <param name="value">The value.</param>
-        public static void GenerateField(CodeMemberMethod method, CodeExpression target, string fieldName, object value)
+        public static void GenerateFieldNonGeneric(CodeMemberMethod method, CodeExpression target, string fieldName, object value)
         {
             method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(target, fieldName), new CodePrimitiveExpression(value)));
         }
@@ -393,7 +394,7 @@ namespace EmptyKeys.UserInterface.Generator
 
                     if (brush.Opacity != (double)Brush.OpacityProperty.DefaultMetadata.DefaultValue)
                     {
-                        GenerateField(method, target, property.Name + ".Opacity", (float)brush.Opacity);
+                        GenerateFieldNonGeneric(method, target, property.Name + ".Opacity", (float)brush.Opacity);
                     }
                 }
             }
@@ -698,6 +699,14 @@ namespace EmptyKeys.UserInterface.Generator
                             typeReference = new CodeTypeReferenceExpression(ownerName);
                         }
 
+                        if (source is EmptyKeys.UserInterface.Designer.Interactions.Action && bindingSource != null)
+                        {
+                            // actions needs source set to its parent behavior, so we can find attached object for binding
+                            var sourceStatement = new CodeAssignStatement(
+                            new CodeFieldReferenceExpression(bindingVar, "Source"), bindingSource);
+                            method.Statements.Add(sourceStatement);
+                        }
+
                         CodeMethodInvokeExpression setBinding = new CodeMethodInvokeExpression(
                             target, "SetBinding", new CodeFieldReferenceExpression(typeReference, property.Name + "Property"), bindingVar);
                         method.Statements.Add(setBinding);
@@ -762,7 +771,7 @@ namespace EmptyKeys.UserInterface.Generator
                 object fallBackValue = binding.FallbackValue;
                 if (fallBackValue.GetType().IsPrimitive || fallBackValue is string)
                 {
-                    GenerateField(method, bindingVar, "FallbackValue", fallBackValue);
+                    GenerateFieldNonGeneric(method, bindingVar, "FallbackValue", fallBackValue);
                 }
                 else
                 {
@@ -775,7 +784,7 @@ namespace EmptyKeys.UserInterface.Generator
 
             if (!string.IsNullOrEmpty(binding.StringFormat))
             {
-                GenerateField(method, bindingVar, "StringFormat", binding.StringFormat);
+                GenerateFieldNonGeneric(method, bindingVar, "StringFormat", binding.StringFormat);
             }
 
             return bindingVar;
@@ -787,7 +796,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="method">The method.</param>
         /// <param name="target">The target.</param>
         /// <param name="source">The source.</param>
-        public static void GenerateResourceReferences(CodeMemberMethod method, CodeExpression target, FrameworkElement source)
+        public static void GenerateResourceReferences(CodeMemberMethod method, CodeExpression target, DependencyObject source)
         {
             LocalValueEnumerator enumerator = source.GetLocalValueEnumerator();
             while (enumerator.MoveNext())

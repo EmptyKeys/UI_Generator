@@ -92,9 +92,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             Console.WriteLine("Generating Fonts...");
             string templatePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SpriteFontTemplate.xml");
-            if (renderMode == RenderMode.Paradox)
+            if (renderMode == RenderMode.Xenko)
             {
-                templatePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SpriteFontTemplate.pdxfnt");
+                templatePath = Path.Combine(Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), "SpriteFontTemplate.xkfnt");
             }
 
             string template = File.OpenText(templatePath).ReadToEnd();
@@ -108,11 +108,11 @@ namespace EmptyKeys.UserInterface.Generator
 
                 string fileContent = string.Empty;
                 string extension = ".spritefont";
-                if (renderMode == RenderMode.Paradox)
+                if (renderMode == RenderMode.Xenko)
                 {
                     string assetGuid = Guid.NewGuid().ToString();
                     fileContent = string.Format(template, fontName, fontSize.ToString(CultureInfo.InvariantCulture), fontStyle, assetGuid);
-                    extension = ".pdxfnt";
+                    extension = ".xkfnt";
                 }
                 else
                 {

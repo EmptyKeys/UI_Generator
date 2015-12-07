@@ -164,7 +164,7 @@ namespace ekUiGen
             using (TextReader tr = File.OpenText(xamlFile))
             {
                 xaml = tr.ReadToEnd();
-            }
+            }            
 
             UserInterfaceGenerator generator = new UserInterfaceGenerator();
             string generatedCode = string.Empty;

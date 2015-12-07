@@ -46,8 +46,8 @@ namespace EmptyKeys.UserInterface.Generator
             var parserContext = new ParserContext
             {
                 BaseUri = new Uri(inputFileName, UriKind.Absolute)                
-            };            
-            
+            };                                   
+
             object source = null;
             try
             {
@@ -83,13 +83,15 @@ namespace EmptyKeys.UserInterface.Generator
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Data"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls.Primitives"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Input"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Input"));            
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Interactions.Core"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Interactivity"));            
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Animation"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Imaging"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Shapes"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Renderers"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));           
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));                 
 
             CodeTypeDeclaration classType = new CodeTypeDeclaration(className);
 
