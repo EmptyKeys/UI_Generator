@@ -41,11 +41,15 @@ namespace EmptyKeys.UserInterface.Generator.Types
         {
             CodeExpression fieldReference = base.Generate(source, classType, initMethod, generateField);
 
-            TextBoxBase textBoxBase = source as TextBoxBase;
+            TextBoxBase textBoxBase = source as TextBoxBase;            
             CodeComHelper.GenerateField<bool>(initMethod, fieldReference, source, TextBoxBase.IsReadOnlyProperty);
             CodeComHelper.GenerateEnumField<ScrollBarVisibility>(initMethod, fieldReference, source, TextBoxBase.HorizontalScrollBarVisibilityProperty);
             CodeComHelper.GenerateEnumField<ScrollBarVisibility>(initMethod, fieldReference, source, TextBoxBase.VerticalScrollBarVisibilityProperty);
             CodeComHelper.GenerateBrushField(initMethod, fieldReference, source, TextBoxBase.CaretBrushProperty);
+            CodeComHelper.GenerateBrushField(initMethod, fieldReference, source, TextBoxBase.SelectionBrushProperty);
+            CodeComHelper.GenerateFieldDoubleToFloat(initMethod, fieldReference, source, TextBoxBase.SelectionOpacityProperty);
+            CodeComHelper.GenerateField<bool>(initMethod, fieldReference, source, TextBoxBase.IsUndoEnabledProperty);
+            CodeComHelper.GenerateField<int>(initMethod, fieldReference, source, TextBoxBase.UndoLimitProperty);
 
             return fieldReference;
         }

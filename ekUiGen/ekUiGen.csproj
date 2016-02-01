@@ -66,9 +66,9 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
     <None Include="packages.config" />
-    <Content Include="SpriteFontTemplate.xkfnt">
+    <None Include="SpriteFontTemplate.xkfnt">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Content>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\EmptyKeys.UserInterface.Designer\EmptyKeys.UserInterface.Designer.csproj">
