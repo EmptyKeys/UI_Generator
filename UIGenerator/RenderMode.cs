@@ -32,8 +32,8 @@ namespace EmptyKeys.UserInterface.Generator
         CocosSharp,
 
         /// <summary>
-        /// Paradox engine
+        /// Xenko engine
         /// </summary>
-        Paradox
+        Xenko
     }
 }

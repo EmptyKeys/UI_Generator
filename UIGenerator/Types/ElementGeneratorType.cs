@@ -3,12 +3,15 @@ using System.CodeDom;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
 using EmptyKeys.UserInterface.Designer.Input;
+using EmptyKeys.UserInterface.Designer.Interactions;
 
 namespace EmptyKeys.UserInterface.Generator.Types
 {
@@ -17,7 +20,10 @@ namespace EmptyKeys.UserInterface.Generator.Types
     /// </summary>
     public class ElementGeneratorType : IGeneratorType
     {
-        private static int nameUniqueId;
+        /// <summary>
+        /// The name unique identifier
+        /// </summary>
+        public static int NameUniqueId;
 
         /// <summary>
         /// Gets the type of the xaml.
@@ -55,8 +61,8 @@ namespace EmptyKeys.UserInterface.Generator.Types
 
             if (string.IsNullOrEmpty(element.Name))
             {
-                element.Name = "e_" + nameUniqueId;
-                nameUniqueId++;
+                element.Name = "e_" + NameUniqueId;
+                NameUniqueId++;
             }
 
             if (generateField)
@@ -105,7 +111,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
 
             if (element.Cursor != null)
             {
-                CursorType cursorType = (CursorType) Enum.Parse(typeof(CursorType), element.Cursor.ToString());
+                CursorType cursorType = (CursorType)Enum.Parse(typeof(CursorType), element.Cursor.ToString());
                 CodeComHelper.GenerateEnumField(method, fieldReference, "CursorType", typeof(CursorType).Name, cursorType.ToString());
             }
 
@@ -120,7 +126,128 @@ namespace EmptyKeys.UserInterface.Generator.Types
                 GenerateInputBindings(method, element, fieldReference);
             }
 
+            var behaviors = Interaction.GetBehaviors(element);
+            if (behaviors.Count > 0)
+            {
+                GenerateBehaviors(behaviors, classType, method, element, fieldReference);
+            }
+
             return fieldReference;
+        }
+
+        private void GenerateBehaviors(BehaviorCollection behaviors, CodeTypeDeclaration classType, CodeMemberMethod method, FrameworkElement element, CodeExpression fieldReference)
+        {
+
+            for (int i = 0; i < behaviors.Count; i++)
+            {
+                var behavior = behaviors[i];
+                string behaviorName = element.Name + "_BEH_" + i;
+                Type type = behavior.GetType();
+                CodeVariableDeclarationStatement variable = new CodeVariableDeclarationStatement(type.Name, behaviorName, new CodeObjectCreateExpression(type.Name));
+                method.Statements.Add(variable);
+                var behaviorVarRef = new CodeVariableReferenceExpression(behaviorName);
+                
+                method.Statements.Add(new CodeMethodInvokeExpression(
+                        new CodeVariableReferenceExpression("Interaction"), "GetBehaviors(" + element.Name + ").Add", behaviorVarRef));
+
+                ValueGenerator valueGenerator = new ValueGenerator();
+                MethodInfo generateFieldMethod = typeof(CodeComHelper).GetMethod("GenerateField");
+
+                LocalValueEnumerator enumerator = behavior.GetLocalValueEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    LocalValueEntry entry = enumerator.Current;
+                    DependencyProperty property = entry.Property;
+                    Type valueType = entry.Value.GetType();
+                    if (CodeComHelper.IsValidForFieldGenerator(entry.Value))
+                    {
+                        if (valueGenerator.Generators.ContainsKey(property.PropertyType) || valueGenerator.Generators.ContainsKey(valueType))
+                        {
+                            CodeExpression propValue = valueGenerator.ProcessGenerators(classType, method, entry.Value, behaviorName);
+                            if (propValue != null)
+                            {
+                                method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(behaviorVarRef, property.Name), propValue));
+                            }
+                        }
+                        else if (entry.Value is ActionCollection)
+                        {
+                            GenerateBehaviorActions(entry.Value as ActionCollection, classType, method, behaviorVarRef, behaviorName);
+                        }
+                        else
+                        {
+                            MethodInfo generic = generateFieldMethod.MakeGenericMethod(property.PropertyType);
+                            if (generic == null)
+                            {
+                                throw new NullReferenceException("Generic method not created for type - " + property.PropertyType);
+                            }
+
+                            generic.Invoke(null, new object[] { method, behaviorVarRef, behavior, property });
+                        }
+                    }
+                }
+
+                CodeComHelper.GenerateBindings(method, behaviorVarRef, behavior, behaviorName);
+                CodeComHelper.GenerateResourceReferences(method, behaviorVarRef, behavior);
+            }
+        }
+
+        private void GenerateBehaviorActions(ActionCollection actionCollection, CodeTypeDeclaration classType, CodeMemberMethod method, CodeVariableReferenceExpression behaviorVarRef, string behaviorName)
+        {
+            for (int i = 0; i < actionCollection.Count; i++)
+            {
+                var action = actionCollection[i];
+                string actionName = behaviorName + "_ACT_" + i;
+                Type type = action.GetType();
+
+                CodeVariableDeclarationStatement variable = new CodeVariableDeclarationStatement(type.Name, actionName, new CodeObjectCreateExpression(type.Name));
+                method.Statements.Add(variable);
+                var actionVarRef = new CodeVariableReferenceExpression(actionName);
+
+                method.Statements.Add(new CodeMethodInvokeExpression(
+                        behaviorVarRef, "Actions.Add", actionVarRef));
+
+                ValueGenerator valueGenerator = new ValueGenerator();
+                MethodInfo generateFieldMethod = typeof(CodeComHelper).GetMethod("GenerateField");
+
+                LocalValueEnumerator enumerator = action.GetLocalValueEnumerator();
+                while (enumerator.MoveNext())
+                {
+                    LocalValueEntry entry = enumerator.Current;
+                    DependencyProperty property = entry.Property;
+                    Type valueType = entry.Value.GetType();
+                    if (CodeComHelper.IsValidForFieldGenerator(entry.Value))
+                    {
+                        if (valueGenerator.Generators.ContainsKey(property.PropertyType) || valueGenerator.Generators.ContainsKey(valueType))
+                        {
+                            CodeExpression propValue = valueGenerator.ProcessGenerators(classType, method, entry.Value, actionName);
+                            if (propValue != null)
+                            {
+                                method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(actionVarRef, property.Name), propValue));
+                            }
+                        }
+                        else if (entry.Value is PropertyPath)
+                        {
+                            PropertyPath path = entry.Value as PropertyPath;
+                            method.Statements.Add(new CodeAssignStatement(
+                                new CodeFieldReferenceExpression(actionVarRef, property.Name), 
+                                new CodeObjectCreateExpression("PropertyPath", new CodePrimitiveExpression(path.Path))));
+                        }
+                        else
+                        {
+                            MethodInfo generic = generateFieldMethod.MakeGenericMethod(property.PropertyType);
+                            if (generic == null)
+                            {
+                                throw new NullReferenceException("Generic method not created for type - " + property.PropertyType);
+                            }
+
+                            generic.Invoke(null, new object[] { method, actionVarRef, action, property });
+                        }
+                    }
+                }
+
+                CodeComHelper.GenerateBindings(method, actionVarRef, action, actionName, behaviorVarRef);
+                //CodeComHelper.GenerateResourceReferences(method, actionVarRef, action);
+            }
         }
 
         private static void GenerateInputBindings(CodeMemberMethod method, FrameworkElement element, CodeExpression fieldReference)
@@ -186,7 +313,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
 
                 if (bindingVar != null)
                 {
-                    DependencyObject depObject = element.InputBindings[i] as DependencyObject;                    
+                    DependencyObject depObject = element.InputBindings[i] as DependencyObject;
                     CodeComHelper.GenerateField<object>(method, bindingVarRef, depObject, InputBinding.CommandParameterProperty);
                     CodeComHelper.GenerateBindings(method, bindingVarRef, depObject, bindingVarName, fieldReference, false);
 
@@ -204,7 +331,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
         {
             for (int i = 0; i < element.Triggers.Count; i++)
             {
-                EventTrigger trigger = element.Triggers[i] as EventTrigger;
+                System.Windows.EventTrigger trigger = element.Triggers[i] as System.Windows.EventTrigger;
                 if (trigger == null)
                 {
                     continue;

@@ -51,7 +51,8 @@ namespace EmptyKeys.UserInterface.Generator
             }
 
             ValueGenerator valueGenerator = new ValueGenerator();
-            foreach (var resourceKey in dictionary.Keys)
+            List<object> keys = dictionary.Keys.Cast<object>().OrderBy(k => k.ToString()).ToList();
+            foreach (var resourceKey in keys)
             {
                 object resourceValue = dictionary[resourceKey];
 
