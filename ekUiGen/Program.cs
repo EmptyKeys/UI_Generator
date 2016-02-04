@@ -172,7 +172,7 @@ namespace ekUiGen
             if (!string.IsNullOrEmpty(defaultAssembly))
                 xaml = Regex.Replace(xaml,
                     @"xmlns(:\w+)?=\""clr-namespace:([.\w]+)(;assembly=)?\""",
-                    $@"xmlns$1=""clr-namespace:$2;assembly=" + defaultAssembly);
+                    $@"xmlns$1=""clr-namespace:$2;assembly=" + defaultAssembly + '"');
 
             UserInterfaceGenerator generator = new UserInterfaceGenerator();
             string generatedCode = string.Empty;
