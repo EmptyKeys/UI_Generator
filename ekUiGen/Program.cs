@@ -1,9 +1,10 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using EmptyKeys.UserInterface.Generator;
 using Mono.Options;
@@ -27,6 +28,7 @@ namespace ekUiGen
             RenderMode renderMode = RenderMode.SunBurn;
             string desiredNamespace = string.Empty;
             string buildDir = string.Empty;
+            string defaultAssembly = string.Empty;
 
             var optionSet = new OptionSet()
                 .Add("?|help|h", "Command line help", o => showHelp = o != null)
@@ -41,7 +43,8 @@ namespace ekUiGen
                     String.Format("Render mode ({0})", String.Join(", ", Enum.GetNames(typeof(RenderMode)))),
                     o => renderMode = o)
                 .Add<string>("ns|namespace=", "The namespace to generate the code under", o => desiredNamespace = o)
-                .Add<string>("bd|buildDir=", "Directory for additional assemblies", o => buildDir = o);
+                .Add<string>("bd|buildDir=", "Directory for additional assemblies", o => buildDir = o)
+                .Add<string>("da|defaultAssembly=", "Assembly name to use for clr-namespaces without an assembly", o => defaultAssembly = o);
 
             try
             {
@@ -123,7 +126,7 @@ namespace ekUiGen
 
                 try
                 {
-                    Generate(file, outputFile, renderMode, desiredNamespace);
+                    Generate(file, outputFile, renderMode, desiredNamespace, defaultAssembly);
                 }
                 catch (Exception ex)
                 {
@@ -158,13 +161,18 @@ namespace ekUiGen
             return 0;
         }
 
-        private static void Generate(string xamlFile, string outputFile, RenderMode renderMode, string desiredNamespace)
+        private static void Generate(string xamlFile, string outputFile, RenderMode renderMode, string desiredNamespace, string defaultAssembly)
         {
             string xaml = string.Empty;
             using (TextReader tr = File.OpenText(xamlFile))
             {
                 xaml = tr.ReadToEnd();
-            }            
+            }
+
+            if (!string.IsNullOrEmpty(defaultAssembly))
+                xaml = Regex.Replace(xaml,
+                    @"xmlns(:\w+)?=\""clr-namespace:([.\w]+)(;assembly=)?\""",
+                    $@"xmlns$1=""clr-namespace:$2;assembly=" + defaultAssembly);
 
             UserInterfaceGenerator generator = new UserInterfaceGenerator();
             string generatedCode = string.Empty;
