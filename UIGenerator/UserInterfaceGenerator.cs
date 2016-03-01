@@ -70,8 +70,7 @@ namespace EmptyKeys.UserInterface.Generator
             Console.WriteLine();
             Console.WriteLine("Generating " + inputFileName);
 
-            ElementGeneratorType.NameUniqueId = 0;
-            string resultCode = string.Empty;
+            ElementGeneratorType.NameUniqueId = 0;            
             string className = Path.GetFileNameWithoutExtension(inputFileName);
 
             CodeNamespace ns = new CodeNamespace(desiredNamespace);
@@ -110,7 +109,7 @@ namespace EmptyKeys.UserInterface.Generator
             ns.Comments.Add(new CodeCommentStatement(" ", false));
             ns.Comments.Add(new CodeCommentStatement(" This file was generated, please do not modify.", false));
             ns.Comments.Add(new CodeCommentStatement(" ", false));
-            ns.Comments.Add(new CodeCommentStatement("-----------------------------------------------------------", false));
+            ns.Comments.Add(new CodeCommentStatement("-----------------------------------------------------------", false));            
 
             CodeMemberMethod initMethod = null;
             if (source is UIRoot)
@@ -146,6 +145,12 @@ namespace EmptyKeys.UserInterface.Generator
 
             FontGenerator.Instance.GenerateManagerCode(initMethod);
 
+            if (BindingGenerator.Instance.IsEnabled)
+            {
+                BindingGenerator.Instance.GenerateRegistrationCode(initMethod);
+            }
+
+            string resultCode = string.Empty;
             using (CodeDomProvider provider = new Microsoft.CSharp.CSharpCodeProvider())
             {
                 string mappedFileName = memoryMappedFileName + className;

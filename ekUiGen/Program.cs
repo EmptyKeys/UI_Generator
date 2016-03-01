@@ -18,8 +18,9 @@ namespace ekUiGen
             Console.WriteLine("Empty Keys (c) 2015 User Interface Generator Console v" + Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             bool showHelp = false;
-            bool IgnoreImageAssets = false;
-            bool IgnoreFontAssets = false;
+            bool ignoreImageAssets = false;
+            bool ignoreFontAssets = false;
+            bool generateBindings = false;
             string inputDirectory = string.Empty;
             string outputDirectory = string.Empty;
             string assetOutputDirectory = string.Empty;
@@ -32,16 +33,17 @@ namespace ekUiGen
                 .Add("?|help|h", "Command line help", o => showHelp = o != null)
                 .Add<string>("i|input=", "Input directory with XAML files", o => inputDirectory = o)
                 .Add<string>("o|output=", "Output directory for .cs files", o => outputDirectory = o)
-                .Add("no-copy-images", "Do not copy generated image assets (ignores input asset directory)", o => IgnoreImageAssets = o != null)
-                .Add("no-fonts", "Do not generate font assets (may lead to broken output)", o => IgnoreFontAssets = o != null)
-                .Add("ignore-assets", "Ignore all asset files and just generate .xaml.cs files", o => IgnoreImageAssets = IgnoreFontAssets = o != null)
+                .Add("no-copy-images", "Do not copy generated image assets (ignores input asset directory)", o => ignoreImageAssets = o != null)
+                .Add("no-fonts", "Do not generate font assets (may lead to broken output)", o => ignoreFontAssets = o != null)
+                .Add("ignore-assets", "Ignore all asset files and just generate .xaml.cs files", o => ignoreImageAssets = ignoreFontAssets = o != null)
                 .Add<string>("ia=", "Input asset directory to copy images from", o => assetInputDirectory = o)
                 .Add<string>("oa=", "Output Asset directory for generated sprite fonts and images", o => assetOutputDirectory = o)
                 .Add<RenderMode>("rm=",
                     String.Format("Render mode ({0})", String.Join(", ", Enum.GetNames(typeof(RenderMode)))),
                     o => renderMode = o)
                 .Add<string>("ns|namespace=", "The namespace to generate the code under", o => desiredNamespace = o)
-                .Add<string>("bd|buildDir=", "Directory for additional assemblies", o => buildDir = o);
+                .Add<string>("bd|buildDir=", "Directory for additional assemblies", o => buildDir = o)
+                .Add("generate-bindings", "Generate data bindings", o => generateBindings = o != null);
 
             try
             {
@@ -82,7 +84,7 @@ namespace ekUiGen
                 return -1;
             }
 
-            if (!(IgnoreFontAssets && IgnoreImageAssets) && string.IsNullOrEmpty(assetOutputDirectory))
+            if (!(ignoreFontAssets && ignoreImageAssets) && string.IsNullOrEmpty(assetOutputDirectory))
             {
                 Console.WriteLine("WARNING: No asset output directory specified. No image or font files will be created (specify --ignore-assets if this was intentional).");
             }
@@ -97,7 +99,7 @@ namespace ekUiGen
                 Directory.CreateDirectory(outputDirectory);
             }
 
-            if (!(IgnoreFontAssets && IgnoreImageAssets) && !string.IsNullOrEmpty(assetOutputDirectory) && !Directory.Exists(assetOutputDirectory))
+            if (!(ignoreFontAssets && ignoreImageAssets) && !string.IsNullOrEmpty(assetOutputDirectory) && !Directory.Exists(assetOutputDirectory))
             {
                 try
                 {
@@ -116,10 +118,17 @@ namespace ekUiGen
                 CopyDirectory(buildDir, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), true);
             }
 
+            BindingGenerator.Instance.IsEnabled = generateBindings;
+
             foreach (var file in Directory.EnumerateFiles(inputDirectory, "*.xaml", SearchOption.AllDirectories))
             {
+                if (BindingGenerator.Instance.IsEnabled)
+                {
+                    BindingGenerator.Instance.GenerateNamespace(desiredNamespace + "." + Path.GetFileNameWithoutExtension(file) + "_Bindings");
+                }
+
                 string relativeDirectory = file.Remove(0, inputDirectory.Length).TrimStart(Path.DirectorySeparatorChar);
-                string outputFile = Path.Combine(outputDirectory, relativeDirectory) + ".cs";
+                string outputFile = Path.Combine(outputDirectory, relativeDirectory) + ".cs";                
 
                 try
                 {
@@ -130,14 +139,20 @@ namespace ekUiGen
                     Console.WriteLine(ex);
                     return -2;
                 }
+
+                if (generateBindings)
+                {
+                    outputFile = Path.Combine(outputDirectory, relativeDirectory) + "_bindings.cs";
+                    BindingGenerator.Instance.GenerateFile(outputFile);
+                }
             }
 
-            if (!IgnoreFontAssets && !string.IsNullOrEmpty(assetOutputDirectory))
+            if (!ignoreFontAssets && !string.IsNullOrEmpty(assetOutputDirectory))
             {
                 FontGenerator.Instance.GenerateFontAssets(assetOutputDirectory, renderMode);
             }
 
-            if (!IgnoreImageAssets)
+            if (!ignoreImageAssets)
             {
                 bool result;
                 if (!string.IsNullOrWhiteSpace(assetInputDirectory))

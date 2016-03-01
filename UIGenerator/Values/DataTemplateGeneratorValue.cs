@@ -47,10 +47,13 @@ namespace EmptyKeys.UserInterface.Generator.Values
             Type dataType = dataTemplate.DataType as Type;
             DependencyObject content = dataTemplate.LoadContent();
             string variableName = baseName + "_dt";
+            Type oldDataType = BindingGenerator.Instance.ActiveDataType;
+            BindingGenerator.Instance.ActiveDataType = dataType;
             string creator = CodeComHelper.GenerateTemplate(parentClass, method, content, variableName);
+            BindingGenerator.Instance.ActiveDataType = oldDataType;
 
             if (dataType != null)
-            {
+            {                
                 return new CodeObjectCreateExpression("DataTemplate", new CodeTypeOfExpression(dataType.FullName), new CodeSnippetExpression(creator));
             }
 

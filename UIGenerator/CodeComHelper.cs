@@ -83,6 +83,8 @@ namespace EmptyKeys.UserInterface.Generator
             ignoredProperties.Add("XmlNamespaceMaps");
             ignoredProperties.Add("IsSelectionActive");
             ignoredProperties.Add("XmlSpace");
+            ignoredProperties.Add("DataType");
+            ignoredProperties.Add("Mode");
         }
 
         /// <summary>
@@ -670,8 +672,9 @@ namespace EmptyKeys.UserInterface.Generator
                     {
                         Binding binding = commandBindingExpr.ParentBinding;
                         string varName = string.Format("{0}_{1}_{2}", "binding", sourceName, property.Name);
+                        GeneratedBindingsMode generatedMode = (GeneratedBindingsMode)source.GetValue(GeneratedBindings.ModeProperty);
 
-                        CodeVariableReferenceExpression bindingVar = GenerateBinding(method, binding, varName);
+                        CodeVariableReferenceExpression bindingVar = GenerateBinding(method, binding, varName, generatedMode);
 
                         if (setBindingSource && bindingSource != null)
                         {
@@ -742,17 +745,36 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="method">The method.</param>
         /// <param name="binding">The binding.</param>
         /// <param name="varName">Name of the variable.</param>
+        /// <param name="generatedMode">The generated mode.</param>
         /// <returns></returns>
-        public static CodeVariableReferenceExpression GenerateBinding(CodeMemberMethod method, Binding binding, string varName)
+        public static CodeVariableReferenceExpression GenerateBinding(CodeMemberMethod method, Binding binding, string varName, GeneratedBindingsMode generatedMode)
         {
-            PropertyPath path = binding.Path;
+            PropertyPath propertyPath = binding.Path;
             CodeVariableReferenceExpression bindingVar = new CodeVariableReferenceExpression(varName);
             CodeTypeReference bindingClassRef = new CodeTypeReference("Binding");
             CodeVariableDeclarationStatement bindingDecl = new CodeVariableDeclarationStatement(bindingClassRef, bindingVar.VariableName);
 
-            if (path != null)
+            bool isGenerated = false;
+            if (propertyPath != null)
             {
-                bindingDecl.InitExpression = new CodeObjectCreateExpression("Binding", new CodePrimitiveExpression(path.Path));
+                string path = propertyPath.Path;
+                if (propertyPath.PathParameters != null && propertyPath.PathParameters.Count > 0)
+                {
+                    path = CreatePathFromParameters(propertyPath);
+                }
+
+                bindingDecl.InitExpression = new CodeObjectCreateExpression("Binding", new CodePrimitiveExpression(path));
+                if (BindingGenerator.Instance.IsEnabled && generatedMode != GeneratedBindingsMode.Reflection)
+                {
+                    if (generatedMode != GeneratedBindingsMode.Manual)
+                    {
+                        isGenerated = BindingGenerator.Instance.GenerateBindingPath(propertyPath, generatedMode);
+                    }
+                    else
+                    {
+                        isGenerated = true;
+                    }
+                }
             }
             else
             {
@@ -760,6 +782,11 @@ namespace EmptyKeys.UserInterface.Generator
             }
 
             method.Statements.Add(bindingDecl);
+
+            if (isGenerated)
+            {
+                GenerateFieldNonGeneric(method, bindingVar, "UseGeneratedBindings", true);
+            }
 
             if (binding.Mode != BindingMode.Default)
             {
@@ -788,6 +815,23 @@ namespace EmptyKeys.UserInterface.Generator
             }
 
             return bindingVar;
+        }
+
+        private static string CreatePathFromParameters(PropertyPath propertyPath)
+        {
+            string path = propertyPath.Path;
+            for (int i = 0; i < propertyPath.PathParameters.Count; i++)
+            {
+                PropertyInfo parameter = propertyPath.PathParameters[i] as PropertyInfo;
+                if (parameter == null)
+                {
+                    continue;
+                }
+                
+                path = path.Replace(string.Format("({0})", i), parameter.Name);
+            }
+
+            return path;
         }
 
         /// <summary>
@@ -1197,6 +1241,11 @@ namespace EmptyKeys.UserInterface.Generator
                     if (targetType == typeof(TextElement))
                     {
                         targetType = typeof(TextBlock);
+                    }
+
+                    if (targetType == typeof(FrameworkElement))
+                    {
+                        targetType = typeof(UIElement);
                     }
                 }
 
