@@ -7,6 +7,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
+using EmptyKeys.UserInterface.Designer;
 using EmptyKeys.UserInterface.Generator.Types;
 using EmptyKeys.UserInterface.Generator.Types.Charts;
 using EmptyKeys.UserInterface.Generator.Types.Controls;
@@ -248,9 +249,11 @@ namespace EmptyKeys.UserInterface.Generator
             IGeneratorType generator;
             Type elementType = source.GetType();
 
+            bool customUserControl = false;
             if (elementType.BaseType == typeof(UserControl))
             {
                 // we have to retype any custom user control to fake generator so we can generate code for it
+                customUserControl = true;
                 elementType = typeof(CustomUserControlGeneratorType);
             }
 
@@ -262,13 +265,21 @@ namespace EmptyKeys.UserInterface.Generator
                 {
                     CodeExpression parent = generator.Generate(xamlSource, classType, method, generateFields);
                     CodeComHelper.GenerateAttachedProperties(method, parent, xamlSource);
+
+                    Type oldDataType = BindingGenerator.Instance.ActiveDataType;
+                    Type newType = xamlSource.GetValue(GeneratedBindings.DataTypeProperty) as Type;
+                    if (newType != null)
+                    {
+                        BindingGenerator.Instance.ActiveDataType = newType;
+                    }
+
                     FrameworkElement elem = source as FrameworkElement;
                     if (elem != null)
                     {
                         CodeComHelper.GenerateBindings(method, parent, elem, elem.Name);
                         CodeComHelper.GenerateResourceReferences(method, parent, elem);
 
-                        if (elem.Resources.Count != 0 || elem.Resources.MergedDictionaries.Count != 0)
+                        if (!customUserControl && (elem.Resources.Count != 0 || elem.Resources.MergedDictionaries.Count != 0))
                         {
                             ResourceDictionaryGenerator resourcesGenerator = new ResourceDictionaryGenerator();
 
@@ -302,6 +313,8 @@ namespace EmptyKeys.UserInterface.Generator
                             }
                         }
                     }
+
+                    BindingGenerator.Instance.ActiveDataType = oldDataType;
 
                     return parent;
                 }

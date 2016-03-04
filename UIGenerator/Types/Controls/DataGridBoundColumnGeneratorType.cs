@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Data;
+using EmptyKeys.UserInterface.Designer;
 
 namespace EmptyKeys.UserInterface.Generator.Types.Controls
 {
@@ -47,7 +48,8 @@ namespace EmptyKeys.UserInterface.Generator.Types.Controls
             Binding commandBindingExpr = column.Binding as Binding;
             if (commandBindingExpr != null)
             {
-                CodeVariableReferenceExpression bindingVar = CodeComHelper.GenerateBinding(initMethod, commandBindingExpr, ColumnName + "_b");
+                GeneratedBindingsMode generatedMode = (GeneratedBindingsMode)source.GetValue(GeneratedBindings.ModeProperty);
+                CodeVariableReferenceExpression bindingVar = CodeComHelper.GenerateBinding(initMethod, commandBindingExpr, ColumnName + "_b", generatedMode);
 
                 var statement = new CodeAssignStatement(new CodeFieldReferenceExpression(fieldReference, "Binding"), bindingVar);
                 initMethod.Statements.Add(statement);
