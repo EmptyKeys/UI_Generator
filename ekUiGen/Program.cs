@@ -16,7 +16,7 @@ namespace ekUiGen
         [STAThread]
         static int Main(string[] args)
         {
-            Console.WriteLine("Empty Keys (c) 2015 User Interface Generator Console v" + Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            Console.WriteLine("Empty Keys (c) 2016 User Interface Generator Console v" + Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             bool showHelp = false;
             bool ignoreImageAssets = false;
@@ -185,9 +185,11 @@ namespace ekUiGen
             }
 
             if (!string.IsNullOrEmpty(defaultAssembly))
+            {
                 xaml = Regex.Replace(xaml,
                     @"xmlns(:\w+)?=\""clr-namespace:([.\w]+)(;assembly=)?\""",
                     $@"xmlns$1=""clr-namespace:$2;assembly=" + defaultAssembly + '"');
+            }
 
             UserInterfaceGenerator generator = new UserInterfaceGenerator();
             string generatedCode = string.Empty;

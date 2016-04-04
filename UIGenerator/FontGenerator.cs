@@ -104,12 +104,13 @@ namespace EmptyKeys.UserInterface.Generator
                 float fontSize = GetFontSize(info);
                 string fontStyle = GetFontStyle(info);
 
-                string assetName = GetFontAssetName(fontName, fontSize, fontStyle);
+                string assetName = GetFontAssetName(fontName, fontSize, fontStyle);                
 
                 string fileContent = string.Empty;
                 string extension = ".spritefont";
                 if (renderMode == RenderMode.Xenko)
                 {
+                    assetName = assetName.Replace(".", "-");
                     string assetGuid = Guid.NewGuid().ToString();
                     fileContent = string.Format(template, fontName, fontSize.ToString(CultureInfo.InvariantCulture), fontStyle, assetGuid);
                     extension = ".xkfnt";
@@ -125,6 +126,7 @@ namespace EmptyKeys.UserInterface.Generator
                 {
                     outfile.Write(fileContent);
                 }
+
                 Console.WriteLine(string.Format("Font {0} , size {1}, style {2} generated to file {3}", fontName, fontSize, fontStyle, fullPath));
             }
         }

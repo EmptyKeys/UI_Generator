@@ -10,7 +10,7 @@ DefaultCharacter: '*'
 CharacterSet: 
 CharacterRegions:
     -   Start: ' '
-        End: "\x7F"
+        End: "΃"
 AntiAlias: ClearType
 NoPremultiply: false
 Spacing: 0.0
