@@ -990,17 +990,28 @@ namespace EmptyKeys.UserInterface.Generator
         {
             foreach (var sound in sounds)
             {
-                CodeMethodInvokeExpression addSound = new CodeMethodInvokeExpression(
-                    new CodeVariableReferenceExpression(collVar), "Add",
-                    new CodeSnippetExpression(
-                        string.Format("new SoundSource {{ SoundType = SoundType.{0}, SoundAsset = \"{1}\" }}", sound.SoundType, sound.SoundAsset)));
+                var soundSource = GenerateSoundSource(method, sound);
+                CodeMethodInvokeExpression addSound = new CodeMethodInvokeExpression(new CodeVariableReferenceExpression(collVar), "Add", soundSource);
                 method.Statements.Add(addSound);
-
-                method.Statements.Add(new CodeMethodInvokeExpression(
-                    new CodeFieldReferenceExpression(new CodeTypeReferenceExpression("SoundManager"), "Instance"),
-                    "AddSound",
-                    new CodePrimitiveExpression(sound.SoundAsset)));
             }
+        }
+
+        /// <summary>
+        /// Generates the sound source.
+        /// </summary>
+        /// <param name="method">The method.</param>        
+        /// <param name="sound">The sound.</param>
+        public static CodeSnippetExpression GenerateSoundSource(CodeMemberMethod method, SoundSource sound)
+        {
+            CodeSnippetExpression expression = new CodeSnippetExpression(
+                string.Format("new SoundSource {{ SoundType = SoundType.{0}, SoundAsset = \"{1}\", Volume = {2}f }}", sound.SoundType, sound.SoundAsset, sound.Volume));            
+
+            method.Statements.Add(new CodeMethodInvokeExpression(
+                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression("SoundManager"), "Instance"),
+                "AddSound",
+                new CodePrimitiveExpression(sound.SoundAsset)));
+
+            return expression;
         }
 
         private static List<DependencyProperty> GetAttachedProperties(DependencyObject obj)

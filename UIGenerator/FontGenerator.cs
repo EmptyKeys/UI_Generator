@@ -122,6 +122,12 @@ namespace EmptyKeys.UserInterface.Generator
 
                 string fullPath = Path.Combine(path, assetName) + extension;
 
+                if (File.Exists(fullPath))
+                {
+                    Console.WriteLine(string.Format("Font {0} , size {1}, style {2} file already exists on {3}", fontName, fontSize, fontStyle, fullPath));
+                    continue;
+                }
+
                 using (StreamWriter outfile = new StreamWriter(fullPath, false, Encoding.UTF8))
                 {
                     outfile.Write(fileContent);

@@ -51,6 +51,25 @@ namespace EmptyKeys.UserInterface.Designer
         }
 
         /// <summary>
+        /// The volume property
+        /// </summary>
+        public static readonly DependencyProperty VolumeProperty =
+            DependencyProperty.Register("Volume", typeof(float), typeof(SoundSource),
+            new FrameworkPropertyMetadata(1f));
+
+        /// <summary>
+        /// Gets or sets the volume.
+        /// </summary>
+        /// <value>
+        /// The volume.
+        /// </value>
+        public float Volume
+        {
+            get { return (float)GetValue(VolumeProperty); }
+            set { SetValue(VolumeProperty, value); }
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="SoundSource"/> class.
         /// </summary>
         public SoundSource()

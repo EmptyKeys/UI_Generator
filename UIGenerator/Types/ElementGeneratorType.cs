@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Data;
 using System.Windows.Input;
 using System.Windows.Media.Animation;
+using EmptyKeys.UserInterface.Designer;
 using EmptyKeys.UserInterface.Designer.Input;
 using EmptyKeys.UserInterface.Designer.Interactions;
 
@@ -229,8 +230,13 @@ namespace EmptyKeys.UserInterface.Generator.Types
                         {
                             PropertyPath path = entry.Value as PropertyPath;
                             method.Statements.Add(new CodeAssignStatement(
-                                new CodeFieldReferenceExpression(actionVarRef, property.Name), 
+                                new CodeFieldReferenceExpression(actionVarRef, property.Name),
                                 new CodeObjectCreateExpression("PropertyPath", new CodePrimitiveExpression(path.Path))));
+                        }
+                        else if (entry.Value is SoundSource)
+                        {
+                            var soundSource = CodeComHelper.GenerateSoundSource(method, entry.Value as SoundSource);
+                            method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(actionVarRef, property.Name), soundSource));
                         }
                         else
                         {
