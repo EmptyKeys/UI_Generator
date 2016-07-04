@@ -43,6 +43,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
 
             Expander expander = source as Expander;
             CodeComHelper.GenerateField<bool>(initMethod, fieldReference, source, Expander.IsExpandedProperty);
+            CodeComHelper.GenerateEnumField<ExpandDirection>(initMethod, fieldReference, source, Expander.ExpandDirectionProperty);
 
             return fieldReference;
         }

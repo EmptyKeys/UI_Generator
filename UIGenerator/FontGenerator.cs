@@ -109,10 +109,14 @@ namespace EmptyKeys.UserInterface.Generator
                 string fileContent = string.Empty;
                 string extension = ".spritefont";
                 if (renderMode == RenderMode.Xenko)
-                {
+                {                     
                     assetName = assetName.Replace(".", "-");
                     string assetGuid = Guid.NewGuid().ToString();
-                    fileContent = string.Format(template, fontName, fontSize.ToString(CultureInfo.InvariantCulture), fontStyle, assetGuid);
+                    string fontSourceGuid = Guid.NewGuid().ToString();
+                    string fontTypeGuid = Guid.NewGuid().ToString();
+                    string charRegionGuid = Guid.NewGuid().ToString();
+                    string version = "{Xenko: 1.7.0-beta04}";
+                    fileContent = string.Format(template, fontName, info.FontSize.ToString(CultureInfo.InvariantCulture), fontStyle, assetGuid, fontSourceGuid, fontTypeGuid, charRegionGuid, version);
                     extension = ".xkfnt";
                 }
                 else

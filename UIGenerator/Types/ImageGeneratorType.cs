@@ -49,7 +49,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
             BitmapImage bitmap = image.Source as BitmapImage;
             if (bitmap != null)
             {
-                CodeComHelper.GenerateBitmapImageField(method, fieldReference, bitmap.UriSource, image.Name + "_bm", "Source");
+                CodeComHelper.GenerateBitmapImageField(method, fieldReference, source, bitmap.UriSource, image.Name + "_bm", Image.SourceProperty);
             }
                      
             CodeComHelper.GenerateEnumField<Stretch>(method, fieldReference, source, Image.StretchProperty);

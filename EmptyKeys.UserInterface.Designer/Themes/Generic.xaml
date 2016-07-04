@@ -44,4 +44,31 @@
             </Setter.Value>
         </Setter>
     </Style>
+
+    <ControlTemplate x:Key="ImageButtonTemplate" TargetType="{x:Type local:ImageButton}">
+        <Border Background="{TemplateBinding Background}" BorderBrush="{TemplateBinding BorderBrush}" BorderThickness="{TemplateBinding BorderThickness}" >
+            <StackPanel Orientation="Horizontal" VerticalAlignment="{TemplateBinding VerticalContentAlignment}" HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}">
+                <Image Name="PART_Image" Source="{TemplateBinding ImageNormal}" />
+                <ContentPresenter HorizontalAlignment="{TemplateBinding HorizontalContentAlignment}" Margin="{TemplateBinding Padding}" 
+                          VerticalAlignment="{TemplateBinding VerticalContentAlignment}" />
+            </StackPanel>
+        </Border>
+        <ControlTemplate.Triggers>
+            <Trigger Property="IsMouseOver" Value="true">
+                <Setter TargetName="PART_Image" Property="Source" Value="{Binding ImageHover, RelativeSource={RelativeSource TemplatedParent}}" />
+            </Trigger>
+            <Trigger Property="IsPressed" Value="true">
+                <Setter TargetName="PART_Image" Property="Source" Value="{Binding ImagePressed, RelativeSource={RelativeSource TemplatedParent}}" />
+            </Trigger>
+            <Trigger Property="IsEnabled" Value="false">
+                <Setter TargetName="PART_Image" Property="Source" Value="{Binding ImageDisabled, RelativeSource={RelativeSource TemplatedParent}}" />
+            </Trigger>
+        </ControlTemplate.Triggers>
+    </ControlTemplate>
+
+    <Style TargetType="{x:Type local:ImageButton}">
+        <Setter Property="VerticalContentAlignment" Value="Center"/>
+        <Setter Property="HorizontalContentAlignment" Value="Center"/>
+        <Setter Property="Template" Value="{StaticResource ImageButtonTemplate}" />
+    </Style>
 </ResourceDictionary>

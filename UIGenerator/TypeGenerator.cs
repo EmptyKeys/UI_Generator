@@ -219,6 +219,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType seriesPoint = new SeriesPointGeneratorType();
             Generators.Add(seriesPoint.XamlType, seriesPoint);
+
+            IGeneratorType imageButton = new ImageButtonGeneratorType();
+            Generators.Add(imageButton.XamlType, imageButton);
         }
 
         /// <summary>

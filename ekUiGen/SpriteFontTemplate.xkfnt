@@ -1,18 +1,18 @@
 !SpriteFont
 Id: {3}
+SerializedVersion: {7}
 Tags: []
-Source: 
-FontName: {0}
-Size: {1}
-Style: {2}
-IsDynamic: false
+FontSource: !SystemFontProvider
+    ~Id: {4}
+    FontName: {0}
+    Style: {2}
+FontType: !OfflineRasterizedSpriteFontType
+    ~Id: {5}
+    Size: {1}
+    CharacterSet: 
+    CharacterRegions:
+        -   ~Id: {6}
+            Start: ' '
+            End: "΃"
+    AntiAlias: ClearType
 DefaultCharacter: '*'
-CharacterSet: 
-CharacterRegions:
-    -   Start: ' '
-        End: "΃"
-AntiAlias: ClearType
-NoPremultiply: false
-Spacing: 0.0
-LineSpacing: 0.0
-UseKerning: true

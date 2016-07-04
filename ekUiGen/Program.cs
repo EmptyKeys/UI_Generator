@@ -204,6 +204,12 @@ namespace ekUiGen
             }
             finally
             {
+                string directory = Path.GetDirectoryName(outputFile);
+                if (!Directory.Exists(directory))
+                {
+                    Directory.CreateDirectory(directory);
+                }
+
                 using (StreamWriter outfile = new StreamWriter(outputFile))
                 {
                     outfile.Write(generatedCode);

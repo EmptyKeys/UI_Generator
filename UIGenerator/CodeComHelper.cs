@@ -493,7 +493,7 @@ namespace EmptyKeys.UserInterface.Generator
             BitmapImage bitmap = image.ImageSource as BitmapImage;
             if (bitmap != null)
             {
-                GenerateBitmapImageField(method, brushExpr, bitmap.UriSource, variableName + "_bm", "ImageSource");
+                GenerateBitmapImageField(method, brushExpr, image, bitmap.UriSource, variableName + "_bm", ImageBrush.ImageSourceProperty);
             }
 
             if (BindingOperations.IsDataBound(image, ImageBrush.ImageSourceProperty))
@@ -533,16 +533,20 @@ namespace EmptyKeys.UserInterface.Generator
         /// </summary>
         /// <param name="method">The method.</param>
         /// <param name="fieldReference">The field reference.</param>
+        /// <param name="source">The source.</param>
         /// <param name="uriSource">The URI source.</param>
         /// <param name="variableName">Name of the variable.</param>
-        /// <param name="sourceProperty">The asset property.</param>
-        public static void GenerateBitmapImageField(CodeMemberMethod method, CodeExpression fieldReference, Uri uriSource, string variableName, string sourceProperty)
+        /// <param name="property">The property.</param>
+        public static void GenerateBitmapImageField(CodeMemberMethod method, CodeExpression fieldReference, DependencyObject source, Uri uriSource, string variableName, DependencyProperty property)
         {
-            GenerateBitmapImageValue(method, uriSource, variableName);
+            if (IsValidForFieldGenerator(source.ReadLocalValue(property)))
+            {
+                GenerateBitmapImageValue(method, uriSource, variableName);
 
-            method.Statements.Add(new CodeAssignStatement(
-                new CodeFieldReferenceExpression(fieldReference, sourceProperty),
-                new CodeVariableReferenceExpression(variableName)));
+                method.Statements.Add(new CodeAssignStatement(
+                    new CodeFieldReferenceExpression(fieldReference, property.Name),
+                    new CodeVariableReferenceExpression(variableName)));
+            }
         }
 
         /// <summary>
