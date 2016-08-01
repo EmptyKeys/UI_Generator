@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Media;
 using EmptyKeys.UserInterface.Generator.Values;
+using EmptyKeys.UserInterface.Generator.Values.Effects;
 
 namespace EmptyKeys.UserInterface.Generator
 {
@@ -132,6 +133,12 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorValue fontWeight = new FontWeightGeneratorValue();
             Generators.Add(fontWeight.ValueType, fontWeight);
+
+            IGeneratorValue directionalBlur = new DirectionalBlurEffectGeneratorValue();
+            Generators.Add(directionalBlur.ValueType, directionalBlur);
+
+            IGeneratorValue customEffect = new CustomEffectGeneratorValue();
+            Generators.Add(customEffect.ValueType, customEffect);
         }
 
         /// <summary>

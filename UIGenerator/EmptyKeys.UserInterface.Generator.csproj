@@ -56,6 +56,7 @@
     </Compile>
     <Compile Include="BindingGenerator.cs" />
     <Compile Include="CodeComHelper.cs" />
+    <Compile Include="EffectAssets.cs" />
     <Compile Include="FontGenerator.cs" />
     <Compile Include="FontInfo.cs" />
     <Compile Include="IGeneratorValue.cs" />
@@ -137,6 +138,8 @@
     <Compile Include="Values\BrushGeneratorValue.cs" />
     <Compile Include="Values\ColorGeneratorValue.cs" />
     <Compile Include="Values\DoubleAnimationGeneratorValue.cs" />
+    <Compile Include="Values\Effects\CustomEffectGeneratorValue.cs" />
+    <Compile Include="Values\Effects\DirectionalBlurEffectGeneratorValue.cs" />
     <Compile Include="Values\EllipseGeometryGeneratorValue.cs" />
     <Compile Include="Values\FontFamilyGeneratorValue.cs" />
     <Compile Include="Values\LineGeometryGeneratorValue.cs" />

@@ -86,6 +86,7 @@ namespace EmptyKeys.UserInterface.Generator
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Interactions.Core"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Interactivity"));            
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media"));
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Effects"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Animation"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Imaging"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Shapes"));
@@ -142,6 +143,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             ImageAssets.Instance.GenerateManagerCode(initMethod);
             ImageAssets.Instance.ClearAssets();
+
+            EffectAssets.Instance.GenerateManagerCode(initMethod);
+            EffectAssets.Instance.ClearAssets();
 
             FontGenerator.Instance.GenerateManagerCode(initMethod);
 

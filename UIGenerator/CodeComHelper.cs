@@ -1066,7 +1066,7 @@ namespace EmptyKeys.UserInterface.Generator
                 CodeExpression valueExpr = GetValueExpression(parentClass, method, value, name);
                 method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(target, property.Name), valueExpr));
             }
-        }
+        }        
 
         /// <summary>
         /// Gets the resource key expression.

@@ -68,6 +68,8 @@
     <Compile Include="Charts\SeriesPointCollection.cs" />
     <Compile Include="DataGrid.cs" />
     <Compile Include="DragDrop.cs" />
+    <Compile Include="Effects\CustomEffect.cs" />
+    <Compile Include="Effects\DirectionalBlurEffect.cs" />
     <Compile Include="EventTrigger.cs" />
     <Compile Include="GeneratedBindingsMode.cs" />
     <Compile Include="GeneratedBindings.cs" />
@@ -113,13 +115,22 @@
       <Generator>ResXFileCodeGenerator</Generator>
       <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
+    <Resource Include="Effects\FakeShader.ps" />
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
       <LastGenOutput>Settings.Designer.cs</LastGenOutput>
     </None>
     <AppDesigner Include="Properties\" />
   </ItemGroup>
+  <ItemGroup>
+    <Content Include="Effects\FakeShader.fx" />
+    <None Include="Effects\CompileShader.bat" />
+  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
+  <PropertyGroup>
+    <PreBuildEvent>
+    </PreBuildEvent>
+  </PropertyGroup>
   <!-- To modify your build process, add your task inside one of the targets below and uncomment it. 
        Other similar extension points exist, see Microsoft.Common.targets.
   <Target Name="BeforeBuild">

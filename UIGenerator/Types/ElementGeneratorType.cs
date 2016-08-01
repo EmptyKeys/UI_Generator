@@ -109,6 +109,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateTemplateStyleField(classType, method, fieldReference, source, FrameworkElement.StyleProperty);
             CodeComHelper.GenerateToolTipField(classType, method, fieldReference, source, FrameworkElement.ToolTipProperty);
             CodeComHelper.GenerateFieldDoubleToFloat(method, fieldReference, source, FrameworkElement.OpacityProperty);
+            CodeComHelper.GenerateTemplateStyleField(classType, method, fieldReference, source, UIElement.EffectProperty);
 
             if (element.Cursor != null)
             {
