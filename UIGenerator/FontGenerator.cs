@@ -35,6 +35,7 @@ namespace EmptyKeys.UserInterface.Generator
         }
 
         private Dictionary<int, FontInfo> fonts = new Dictionary<int, FontInfo>();
+        private Dictionary<int, FontInfo> generateFonts = new Dictionary<int, FontInfo>();
 
         /// <summary>
         /// Prevents a default instance of the <see cref="FontGenerator"/> class from being created.
@@ -54,7 +55,8 @@ namespace EmptyKeys.UserInterface.Generator
         public void AddFont(FontFamily family, double size, FontStyle style, FontWeight weight, CodeMemberMethod method)
         {
             FontInfo info = new FontInfo(family, size, style, weight);
-            fonts[info.GetHashCode()] = info;            
+            fonts[info.GetHashCode()] = info;
+            generateFonts[info.GetHashCode()] = info;
         }
 
         /// <summary>
@@ -76,6 +78,8 @@ namespace EmptyKeys.UserInterface.Generator
                     new CodeTypeReferenceExpression("FontManager"), "Instance.AddFont",
                         new CodePrimitiveExpression(fontName), new CodePrimitiveExpression((float)info.FontSize), styleExpr, new CodePrimitiveExpression(assetName)));
             }
+
+            fonts.Clear();
         }
 
         /// <summary>
@@ -85,7 +89,7 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="renderMode">The render mode.</param>
         public void GenerateFontAssets(string path, RenderMode renderMode)
         {
-            if (fonts.Count == 0)
+            if (generateFonts.Count == 0)
             {
                 return;
             }
@@ -98,7 +102,7 @@ namespace EmptyKeys.UserInterface.Generator
             }
 
             string template = File.OpenText(templatePath).ReadToEnd();
-            foreach (var info in fonts.Values)
+            foreach (var info in generateFonts.Values)
             {
                 string fontName = GetFontName(info);
                 float fontSize = GetFontSize(info);

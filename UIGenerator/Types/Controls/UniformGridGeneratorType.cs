@@ -5,15 +5,15 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows;
-using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
 
-namespace EmptyKeys.UserInterface.Generator.Types
+namespace EmptyKeys.UserInterface.Generator.Types.Controls
 {
     /// <summary>
-    /// Implements Text Box control generator
+    /// Implements generator for Uniform Grid control
     /// </summary>
-    public class TextBoxGeneratorType : TextBoxBaseGeneratorType
+    /// <seealso cref="EmptyKeys.UserInterface.Generator.Types.PanelGeneratorType" />
+    public class UniformGridGeneratorType : PanelGeneratorType
     {
         /// <summary>
         /// Gets the type of the xaml.
@@ -23,16 +23,13 @@ namespace EmptyKeys.UserInterface.Generator.Types
         /// </value>
         public override Type XamlType
         {
-            get
-            {
-                return typeof(TextBox);
-            }
+            get { return typeof(UniformGrid); }
         }
 
         /// <summary>
-        /// Generates code
+        /// Generates the specified initialize method.
         /// </summary>
-        /// <param name="source">The dependence object</param>
+        /// <param name="source">The dependency object</param>
         /// <param name="classType">Type of the class.</param>
         /// <param name="initMethod">The initialize method.</param>
         /// <param name="generateField">if set to <c>true</c> [generate field].</param>
@@ -41,9 +38,10 @@ namespace EmptyKeys.UserInterface.Generator.Types
         {
             CodeExpression fieldReference = base.Generate(source, classType, initMethod, generateField);
 
-            TextBox textBox = source as TextBox;
-            CodeComHelper.GenerateField<string>(initMethod, fieldReference, source, TextBox.TextProperty);
-            CodeComHelper.GenerateField<int>(initMethod, fieldReference, source, TextBox.MaxLengthProperty);
+            UniformGrid uniGrid = source as UniformGrid;                        
+            CodeComHelper.GenerateField<int>(initMethod, fieldReference, source, UniformGrid.FirstColumnProperty);
+            CodeComHelper.GenerateField<int>(initMethod, fieldReference, source, UniformGrid.RowsProperty);
+            CodeComHelper.GenerateField<int>(initMethod, fieldReference, source, UniformGrid.ColumnsProperty);
 
             return fieldReference;
         }

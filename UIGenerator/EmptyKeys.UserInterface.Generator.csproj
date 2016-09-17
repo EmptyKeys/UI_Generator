@@ -84,6 +84,7 @@
     <Compile Include="Types\Controls\RadioButtonGeneratorType.cs" />
     <Compile Include="Types\Controls\TreeViewGeneratorType.cs" />
     <Compile Include="Types\Controls\TreeViewItemGeneratorType.cs" />
+    <Compile Include="Types\Controls\UniformGridGeneratorType.cs" />
     <Compile Include="Types\Controls\WrapPanelGeneratorType.cs" />
     <Compile Include="Types\CustomUserControlGeneratorType.cs" />
     <Compile Include="Types\AnimatedImageGeneratorType.cs" />

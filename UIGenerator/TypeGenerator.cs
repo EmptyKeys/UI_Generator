@@ -222,6 +222,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType imageButton = new ImageButtonGeneratorType();
             Generators.Add(imageButton.XamlType, imageButton);
+
+            IGeneratorType uniGrid = new UniformGridGeneratorType();
+            Generators.Add(uniGrid.XamlType, uniGrid);
         }
 
         /// <summary>

@@ -76,6 +76,7 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("IsMouseWheelEnabled");
             supportedAttachedProperties.Add("SortingCommand");
             supportedAttachedProperties.Add("IsSoundEnabled");
+            supportedAttachedProperties.Add("IsSelectedDataEnabled");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");

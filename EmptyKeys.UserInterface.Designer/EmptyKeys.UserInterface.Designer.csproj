@@ -87,6 +87,7 @@
     <Compile Include="Interactions\Interaction.cs" />
     <Compile Include="Interactions\InvokeCommandAction.cs" />
     <Compile Include="Interactions\PlaySoundAction.cs" />
+    <Compile Include="ListBox.cs" />
     <Compile Include="NumericTextBox.cs" />
     <Compile Include="PasswordBox.cs" />
     <Compile Include="Properties\AssemblyInfo.cs">
