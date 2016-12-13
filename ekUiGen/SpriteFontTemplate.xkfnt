@@ -1,17 +1,15 @@
 !SpriteFont
 Id: {3}
-SerializedVersion: {7}
+SerializedVersion: {5}
 Tags: []
-FontSource: !SystemFontProvider
-    ~Id: {4}
+FontSource: !SystemFontProvider    
     FontName: {0}
     Style: {2}
-FontType: !OfflineRasterizedSpriteFontType
-    ~Id: {5}
+FontType: !OfflineRasterizedSpriteFontType    
     Size: {1}
     CharacterSet: 
     CharacterRegions:
-        -   ~Id: {6}
+        {4}:
             Start: ' '
             End: "΃"
     AntiAlias: ClearType

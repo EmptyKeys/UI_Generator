@@ -39,6 +39,33 @@ namespace EmptyKeys.UserInterface.Designer
         /// </summary>
         public static readonly DependencyProperty SortingCommandProperty =
             DependencyProperty.RegisterAttached("SortingCommand", typeof(ICommand), typeof(DataGrid),
-            new FrameworkPropertyMetadata(null));        
+            new FrameworkPropertyMetadata(null));
+
+        /// <summary>
+        /// The virtualized cache maximum rows property
+        /// </summary>
+        public static readonly DependencyProperty VirtualizedCacheMaxRowsProperty =
+            DependencyProperty.RegisterAttached("VirtualizedCacheMaxRows", typeof(int), typeof(DataGrid),
+            new FrameworkPropertyMetadata(50));
+
+        /// <summary>
+        /// Gets the virtualized cache maximum rows.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <returns></returns>
+        public static int GetVirtualizedCacheMaxRows(DependencyObject obj)
+        {
+            return (int)obj.GetValue(VirtualizedCacheMaxRowsProperty);
+        }
+
+        /// <summary>
+        /// Sets the virtualized cache maximum rows.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="value">The value.</param>
+        public static void SetVirtualizedCacheMaxRows(DependencyObject obj, int value)
+        {
+            obj.SetValue(VirtualizedCacheMaxRowsProperty, value);
+        }
     }
 }

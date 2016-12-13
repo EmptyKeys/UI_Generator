@@ -45,6 +45,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
             DataGrid grid = source as DataGrid;
             CodeComHelper.GenerateEnumField<DataGridSelectionMode>(initMethod, fieldReference, source, DataGrid.SelectionModeProperty);
             CodeComHelper.GenerateField<bool>(initMethod, fieldReference, source, DataGrid.AutoGenerateColumnsProperty);
+            CodeComHelper.GenerateField<bool>(initMethod, fieldReference, source, DataGrid.EnableRowVirtualizationProperty);
             CodeComHelper.GenerateEnumField<ScrollBarVisibility>(initMethod, fieldReference, source, DataGrid.HorizontalScrollBarVisibilityProperty);
             CodeComHelper.GenerateEnumField<ScrollBarVisibility>(initMethod, fieldReference, source, DataGrid.VerticalScrollBarVisibilityProperty);
 

@@ -77,6 +77,9 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("SortingCommand");
             supportedAttachedProperties.Add("IsSoundEnabled");
             supportedAttachedProperties.Add("IsSelectedDataEnabled");
+            supportedAttachedProperties.Add("VirtualizedCacheMaxRows");
+            supportedAttachedProperties.Add("VirtualizedCacheMaxItems");
+            supportedAttachedProperties.Add("EnableVirtualization");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");
