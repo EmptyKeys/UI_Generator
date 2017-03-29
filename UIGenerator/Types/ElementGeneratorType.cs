@@ -101,6 +101,7 @@ namespace EmptyKeys.UserInterface.Generator.Types
             CodeComHelper.GenerateField<bool>(method, fieldReference, source, FrameworkElement.IsEnabledProperty);
             CodeComHelper.GenerateField<bool>(method, fieldReference, source, FrameworkElement.IsHitTestVisibleProperty);
             CodeComHelper.GenerateField<bool>(method, fieldReference, source, FrameworkElement.SnapsToDevicePixelsProperty);
+            CodeComHelper.GenerateField<bool>(method, fieldReference, source, FrameworkElement.UseLayoutRoundingProperty);
             CodeComHelper.GenerateField<bool>(method, fieldReference, source, UIElement.FocusableProperty);
             CodeComHelper.GenerateEnumField<Visibility>(method, fieldReference, source, FrameworkElement.VisibilityProperty);
             CodeComHelper.GenerateThicknessField(method, fieldReference, source, FrameworkElement.MarginProperty);

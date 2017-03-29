@@ -80,6 +80,7 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("VirtualizedCacheMaxRows");
             supportedAttachedProperties.Add("VirtualizedCacheMaxItems");
             supportedAttachedProperties.Add("EnableVirtualization");
+            supportedAttachedProperties.Add("ColorOverlay");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");
@@ -474,7 +475,7 @@ namespace EmptyKeys.UserInterface.Generator
                 return brushExpr;
             }
 
-            ImageBrush image = brush as ImageBrush;
+            System.Windows.Media.ImageBrush image = brush as System.Windows.Media.ImageBrush;
             if (image != null)
             {
                 brushExpr = GenerateImageBrush(method, variableName, brushTypeName, brushExpr, image);
@@ -486,7 +487,7 @@ namespace EmptyKeys.UserInterface.Generator
             return brushExpr;
         }
 
-        private static CodeExpression GenerateImageBrush(CodeMemberMethod method, string variableName, string brushTypeName, CodeExpression brushExpr, ImageBrush image)
+        private static CodeExpression GenerateImageBrush(CodeMemberMethod method, string variableName, string brushTypeName, CodeExpression brushExpr, System.Windows.Media.ImageBrush image)
         {
             CodeVariableDeclarationStatement variable = new CodeVariableDeclarationStatement(
                 "ImageBrush", variableName,
@@ -497,18 +498,18 @@ namespace EmptyKeys.UserInterface.Generator
             BitmapImage bitmap = image.ImageSource as BitmapImage;
             if (bitmap != null)
             {
-                GenerateBitmapImageField(method, brushExpr, image, bitmap.UriSource, variableName + "_bm", ImageBrush.ImageSourceProperty);
+                GenerateBitmapImageField(method, brushExpr, image, bitmap.UriSource, variableName + "_bm", System.Windows.Media.ImageBrush.ImageSourceProperty);
             }
 
-            if (BindingOperations.IsDataBound(image, ImageBrush.ImageSourceProperty))
+            if (BindingOperations.IsDataBound(image, System.Windows.Media.ImageBrush.ImageSourceProperty))
             {
                 CodeComHelper.GenerateBindings(method, brushExpr, image, variableName);
             }
 
-            GenerateEnumField<Stretch>(method, brushExpr, image, ImageBrush.StretchProperty);
-            GenerateEnumField<BrushMappingMode>(method, brushExpr, image, ImageBrush.ViewboxUnitsProperty);
+            GenerateEnumField<Stretch>(method, brushExpr, image, System.Windows.Media.ImageBrush.StretchProperty);
+            GenerateEnumField<BrushMappingMode>(method, brushExpr, image, System.Windows.Media.ImageBrush.ViewboxUnitsProperty);
             GenerateFieldDoubleToFloat(method, brushExpr, image, Brush.OpacityProperty);
-            GenerateRect(method, brushExpr, image, ImageBrush.ViewboxProperty);
+            GenerateRect(method, brushExpr, image, System.Windows.Media.ImageBrush.ViewboxProperty);
 
             GenerateAttachedProperties(method, brushExpr, image);
 
@@ -835,7 +836,7 @@ namespace EmptyKeys.UserInterface.Generator
                 {
                     continue;
                 }
-                
+
                 path = path.Replace(string.Format("({0})", i), parameter.Name);
             }
 
@@ -963,6 +964,19 @@ namespace EmptyKeys.UserInterface.Generator
                                 new CodeFieldReferenceExpression(enumType, value.ToString()));
                             method.Statements.Add(setValue);
                         }
+                        else if (value is Color)
+                        {
+                            Color valueColor = (Color)value;
+
+                            CodeMethodInvokeExpression setValue = new CodeMethodInvokeExpression(
+                                typeReference, "Set" + property.Name, target,
+                                new CodeObjectCreateExpression("ColorW",
+                                    new CodePrimitiveExpression(valueColor.R),
+                                    new CodePrimitiveExpression(valueColor.G),
+                                    new CodePrimitiveExpression(valueColor.B),
+                                    new CodePrimitiveExpression(valueColor.A)));
+                            method.Statements.Add(setValue);                            
+                        }
                         else
                         {
                             if (value is double)
@@ -1012,7 +1026,7 @@ namespace EmptyKeys.UserInterface.Generator
         public static CodeSnippetExpression GenerateSoundSource(CodeMemberMethod method, SoundSource sound)
         {
             CodeSnippetExpression expression = new CodeSnippetExpression(
-                string.Format("new SoundSource {{ SoundType = SoundType.{0}, SoundAsset = \"{1}\", Volume = {2}f }}", sound.SoundType, sound.SoundAsset, sound.Volume));            
+                string.Format("new SoundSource {{ SoundType = SoundType.{0}, SoundAsset = \"{1}\", Volume = {2}f }}", sound.SoundType, sound.SoundAsset, sound.Volume));
 
             method.Statements.Add(new CodeMethodInvokeExpression(
                 new CodeFieldReferenceExpression(new CodeTypeReferenceExpression("SoundManager"), "Instance"),
@@ -1070,7 +1084,7 @@ namespace EmptyKeys.UserInterface.Generator
                 CodeExpression valueExpr = GetValueExpression(parentClass, method, value, name);
                 method.Statements.Add(new CodeAssignStatement(new CodeFieldReferenceExpression(target, property.Name), valueExpr));
             }
-        }        
+        }
 
         /// <summary>
         /// Gets the resource key expression.
@@ -1251,6 +1265,7 @@ namespace EmptyKeys.UserInterface.Generator
             {
                 setterValue = Convert.ToSingle(setterValue); // TODO maybe there is better solution for this
             }
+            
             CodeExpression setterValueExpr = GetValueExpression(parentClass, method, setterValue, setterVarName);
             if (setterValueExpr != null)
             {

@@ -38,15 +38,16 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="inputFileContent">Content of the input file.</param>
         /// <param name="renderMode">The render mode.</param>
         /// <param name="desiredNamespace">The desired namespace.</param>
+        /// <param name="header">The header.</param>
         /// <returns></returns>
-        public string GenerateCode(string inputFileName, string inputFileContent, RenderMode renderMode, string desiredNamespace)
+        public string GenerateCode(string inputFileName, string inputFileContent, RenderMode renderMode, string desiredNamespace, string header)
         {
             inputFileContent = RemoveClass(inputFileContent);
 
             var parserContext = new ParserContext
             {
-                BaseUri = new Uri(inputFileName, UriKind.Absolute)                
-            };                                   
+                BaseUri = new Uri(inputFileName, UriKind.Absolute)
+            };
 
             object source = null;
             try
@@ -65,12 +66,12 @@ namespace EmptyKeys.UserInterface.Generator
             if (source == null)
             {
                 return "Source is empty. XAML file is not valid.";
-            }            
+            }
 
             Console.WriteLine();
             Console.WriteLine("Generating " + inputFileName);
 
-            ElementGeneratorType.NameUniqueId = 0;            
+            ElementGeneratorType.NameUniqueId = 0;
             string className = Path.GetFileNameWithoutExtension(inputFileName);
 
             CodeNamespace ns = new CodeNamespace(desiredNamespace);
@@ -82,16 +83,16 @@ namespace EmptyKeys.UserInterface.Generator
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Data"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Controls.Primitives"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Input"));            
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Input"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Interactions.Core"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Interactivity"));            
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Interactivity"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Effects"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Animation"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Media.Imaging"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Shapes"));
             ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Renderers"));
-            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));                 
+            ns.Imports.Add(new CodeNamespaceImport("EmptyKeys.UserInterface.Themes"));
 
             CodeTypeDeclaration classType = new CodeTypeDeclaration(className);
 
@@ -106,11 +107,18 @@ namespace EmptyKeys.UserInterface.Generator
                         new CodePrimitiveExpression(generatedCodeAttribute.Version)));
             classType.CustomAttributes.Add(codeAttrDecl);
 
-            ns.Comments.Add(new CodeCommentStatement("-----------------------------------------------------------", false));
-            ns.Comments.Add(new CodeCommentStatement(" ", false));
-            ns.Comments.Add(new CodeCommentStatement(" This file was generated, please do not modify.", false));
-            ns.Comments.Add(new CodeCommentStatement(" ", false));
-            ns.Comments.Add(new CodeCommentStatement("-----------------------------------------------------------", false));            
+            if (string.IsNullOrEmpty(header))
+            {
+                ns.Comments.Add(new CodeCommentStatement("-----------------------------------------------------------", false));
+                ns.Comments.Add(new CodeCommentStatement(" ", false));
+                ns.Comments.Add(new CodeCommentStatement(" This file was generated, please do not modify.", false));
+                ns.Comments.Add(new CodeCommentStatement(" ", false));
+                ns.Comments.Add(new CodeCommentStatement("-----------------------------------------------------------", false));
+            }
+            else
+            {
+                ns.Comments.Add(new CodeCommentStatement(header, false));
+            }
 
             CodeMemberMethod initMethod = null;
             if (source is UIRoot)

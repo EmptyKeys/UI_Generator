@@ -73,6 +73,7 @@
     <Compile Include="EventTrigger.cs" />
     <Compile Include="GeneratedBindingsMode.cs" />
     <Compile Include="GeneratedBindings.cs" />
+    <Compile Include="ImageBrush.cs" />
     <Compile Include="ImageButton.cs" />
     <Compile Include="Input\GamepadBinding.cs" />
     <Compile Include="Input\GamepadGesture.cs" />

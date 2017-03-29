@@ -43,7 +43,14 @@ namespace EmptyKeys.UserInterface.Generator.Values
             {
                 FontWeight fontWeight = (FontWeight)value;
                 CodeTypeReferenceExpression typeReference = new CodeTypeReferenceExpression("FontStyle");
-                valueExpression = new CodeFieldReferenceExpression(typeReference, fontWeight.ToString());
+                if (fontWeight == FontWeights.Normal)
+                {
+                    valueExpression = new CodeFieldReferenceExpression(typeReference, "Regular");
+                }
+                else
+                {
+                    valueExpression = new CodeFieldReferenceExpression(typeReference, fontWeight.ToString());
+                }
             }
 
             return valueExpression;

@@ -30,6 +30,7 @@ namespace ekUiGen
             string desiredNamespace = string.Empty;
             string buildDir = string.Empty;
             string defaultAssembly = string.Empty;
+            string headerFile = string.Empty;
 
             var optionSet = new OptionSet()
                 .Add("?|help|h", "Command line help", o => showHelp = o != null)
@@ -46,7 +47,8 @@ namespace ekUiGen
                 .Add<string>("ns|namespace=", "The namespace to generate the code under", o => desiredNamespace = o)
                 .Add<string>("bd|buildDir=", "Directory for additional assemblies", o => buildDir = o)
                 .Add("generate-bindings", "Generate data bindings", o => generateBindings = o != null)
-                .Add<string>("da|defaultAssembly=", "Assembly name to use for clr-namespaces without an assembly", o => defaultAssembly = o);
+                .Add<string>("da|defaultAssembly=", "Assembly name to use for clr-namespaces without an assembly", o => defaultAssembly = o)
+                .Add<string>("header=", "Header file for generated .cs files", o => headerFile = o);
 
             try
             {
@@ -121,6 +123,18 @@ namespace ekUiGen
                 CopyDirectory(buildDir, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), true);
             }
 
+            string header = string.Empty;
+            if (!string.IsNullOrEmpty(headerFile))
+            {
+                if (!File.Exists(headerFile))
+                {
+                    Console.WriteLine($"Header file {headerFile} does not exist.");
+                    return -1;
+                }
+
+                header = File.ReadAllText(headerFile);
+            }
+
             BindingGenerator.Instance.IsEnabled = generateBindings;
 
             foreach (var file in Directory.EnumerateFiles(inputDirectory, "*.xaml", SearchOption.AllDirectories))
@@ -135,7 +149,7 @@ namespace ekUiGen
 
                 try
                 {
-                    Generate(file, outputFile, renderMode, desiredNamespace, defaultAssembly);
+                    Generate(file, outputFile, renderMode, desiredNamespace, defaultAssembly, header);
                 }
                 catch (Exception ex)
                 {
@@ -176,7 +190,7 @@ namespace ekUiGen
             return 0;
         }
 
-        private static void Generate(string xamlFile, string outputFile, RenderMode renderMode, string desiredNamespace, string defaultAssembly)
+        private static void Generate(string xamlFile, string outputFile, RenderMode renderMode, string desiredNamespace, string defaultAssembly, string header)
         {
             string xaml = string.Empty;
             using (TextReader tr = File.OpenText(xamlFile))
@@ -195,7 +209,7 @@ namespace ekUiGen
             string generatedCode = string.Empty;
             try
             {
-                generatedCode = generator.GenerateCode(xamlFile, xaml, renderMode, desiredNamespace);
+                generatedCode = generator.GenerateCode(xamlFile, xaml, renderMode, desiredNamespace, header);
             }
             catch (Exception ex)
             {
