@@ -295,7 +295,7 @@ namespace EmptyKeys.UserInterface.Generator
                             resourcesMethod.Parameters.Add(new CodeParameterDeclarationExpression("UIElement", "elem"));
                             classType.Members.Add(resourcesMethod);
                             resourcesGenerator.Generate(elem.Resources, classType, resourcesMethod, 
-                                new CodeFieldReferenceExpression(new CodeVariableReferenceExpression("elem"), "Resources"));
+                                new CodeFieldReferenceExpression(new CodeVariableReferenceExpression("elem"), "Resources"), elem);
 
                             method.Statements.Add(new CodeMethodInvokeExpression(null,resourcesMethod.Name, parent));
                         }
