@@ -25,7 +25,7 @@ namespace EmptyKeys.UserInterface.Generator
     public class UserInterfaceGenerator
     {
         private readonly string memoryMappedFileName = "GenerationCodeMapppedFile";
-        private readonly long nemoryMappedFileCapacity = 1000000;
+        private readonly long nemoryMappedFileCapacity = 2000000;
         private readonly string initComponentsMethodName = "InitializeComponent";
         private readonly string initMethodName = "Initialize";
 
@@ -139,7 +139,7 @@ namespace EmptyKeys.UserInterface.Generator
                 if (dictionary != null)
                 {
                     ResourceDictionaryGenerator resourcesGenerator = new ResourceDictionaryGenerator();
-                    resourcesGenerator.Generate(dictionary, classType, initMethod, new CodeThisReferenceExpression());
+                    resourcesGenerator.Generate(dictionary, classType, initMethod, new CodeThisReferenceExpression(), string.Empty);
                 }
             }
             else

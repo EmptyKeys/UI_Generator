@@ -1,13 +1,10 @@
-﻿using System;
+﻿using EmptyKeys.UserInterface.Designer;
+using System;
 using System.CodeDom;
-using System.Collections;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Controls;
 using System.Windows.Controls.Primitives;
@@ -16,8 +13,6 @@ using System.Windows.Documents;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Media.Imaging;
-using EmptyKeys.UserInterface.Designer;
-using EmptyKeys.UserInterface.Designer.Interactions;
 
 namespace EmptyKeys.UserInterface.Generator
 {
@@ -89,6 +84,7 @@ namespace EmptyKeys.UserInterface.Generator
             ignoredProperties.Add("IsSelectionActive");
             ignoredProperties.Add("XmlSpace");
             ignoredProperties.Add("DataType");
+            ignoredProperties.Add("DataTypeString");
             ignoredProperties.Add("Mode");
         }
 
@@ -574,7 +570,12 @@ namespace EmptyKeys.UserInterface.Generator
             }
 
             string extension = Path.GetExtension(imageAsset);
-            imageAsset = imageAsset.Replace(extension, string.Empty).TrimStart(Path.DirectorySeparatorChar, '/');
+            if (!ImageAssets.Instance.GenerateWithExtensions)
+            {
+                imageAsset = imageAsset.Replace(extension, string.Empty);
+            }
+
+            imageAsset = imageAsset.TrimStart(Path.DirectorySeparatorChar, '/');
 
             CodeVariableDeclarationStatement bitmapVariable = new CodeVariableDeclarationStatement(
                     "BitmapImage", variableName,
@@ -975,7 +976,7 @@ namespace EmptyKeys.UserInterface.Generator
                                     new CodePrimitiveExpression(valueColor.G),
                                     new CodePrimitiveExpression(valueColor.B),
                                     new CodePrimitiveExpression(valueColor.A)));
-                            method.Statements.Add(setValue);                            
+                            method.Statements.Add(setValue);
                         }
                         else
                         {
@@ -1194,10 +1195,82 @@ namespace EmptyKeys.UserInterface.Generator
                     continue;
                 }
 
+                MultiTrigger multiTrigger = triggerBase as MultiTrigger;
+                if (multiTrigger != null)
+                {
+                    GenerateMultiTrigger(parentClass, method, variableName, targetType, triggerIndex, multiTrigger);
+                    triggerIndex++;
+                    continue;
+                }
+
                 string errorText = string.Format("Trigger type {0} not supported.", triggerBase.GetType().Name);
                 Console.WriteLine(errorText);
                 GenerateError(method, errorText);
             }
+        }
+
+        private static void GenerateMultiTrigger(CodeTypeDeclaration parentClass, CodeMemberMethod method, string parentName, Type targetType, int triggerIndex, MultiTrigger trigger)
+        {
+            string triggerVarName = parentName + "_MT_" + triggerIndex;
+            CodeVariableDeclarationStatement triggerVar =
+                new CodeVariableDeclarationStatement("MultiTrigger", triggerVarName, new CodeObjectCreateExpression("MultiTrigger"));
+            method.Statements.Add(triggerVar);
+
+            for (int i = 0; i < trigger.Conditions.Count; i++)
+            {
+                var condition = trigger.Conditions[i];
+                string conditionVarName = triggerVarName + "_C_" + i;
+                CodeVariableDeclarationStatement conditionVar =
+                    new CodeVariableDeclarationStatement("TriggerCondition", conditionVarName, new CodeObjectCreateExpression("TriggerCondition"));
+                method.Statements.Add(conditionVar);
+
+                CodeAssignStatement triggerProperty = new CodeAssignStatement(
+                new CodeFieldReferenceExpression(new CodeVariableReferenceExpression(conditionVarName), "Property"),
+                new CodeFieldReferenceExpression(new CodeTypeReferenceExpression(targetType.Name), condition.Property.Name + "Property"));
+                method.Statements.Add(triggerProperty);
+
+                CodeExpression triggerValueExpr = GetValueExpression(parentClass, method, condition.Value, conditionVarName);
+
+                CodeAssignStatement triggerValue = new CodeAssignStatement(
+                    new CodeFieldReferenceExpression(new CodeVariableReferenceExpression(conditionVarName), "Value"),
+                    triggerValueExpr);
+                method.Statements.Add(triggerValue);
+
+                CodeMethodInvokeExpression addCondition = new CodeMethodInvokeExpression(
+                        new CodeVariableReferenceExpression(triggerVarName), "Conditions.Add", new CodeVariableReferenceExpression(conditionVarName));
+                method.Statements.Add(addCondition);
+            }
+            
+
+            int setterIndex = 0;
+            foreach (var setterBase in trigger.Setters)
+            {
+                Setter setter = setterBase as Setter;
+                if (setter != null)
+                {
+                    string setterVarName = triggerVarName + "_S_" + setterIndex;
+
+                    GenerateSetter(parentClass, method, targetType, setter, setterVarName);
+
+                    CodeMethodInvokeExpression addSetter = new CodeMethodInvokeExpression(
+                        new CodeVariableReferenceExpression(triggerVarName), "Setters.Add", new CodeVariableReferenceExpression(setterVarName));
+                    method.Statements.Add(addSetter);
+
+                    setterIndex++;
+                }
+                else
+                {
+                    string errorText = string.Format("Setter type {0} not supported.", setterBase.GetType().Name);
+                    Console.WriteLine(errorText);
+
+                    CodeSnippetStatement error = new CodeSnippetStatement("#error " + errorText);
+                    method.Statements.Add(error);
+                }
+            }
+
+            CodeMethodInvokeExpression addTrigger = new CodeMethodInvokeExpression(
+                        new CodeVariableReferenceExpression(parentName), "Triggers.Add", new CodeVariableReferenceExpression(triggerVarName));
+            method.Statements.Add(addTrigger);
         }
 
         private static void GenerateTrigger(CodeTypeDeclaration parentClass, CodeMemberMethod method, string parentName, Type targetType, int triggerIndex, Trigger trigger)
@@ -1265,7 +1338,7 @@ namespace EmptyKeys.UserInterface.Generator
             {
                 setterValue = Convert.ToSingle(setterValue); // TODO maybe there is better solution for this
             }
-            
+
             CodeExpression setterValueExpr = GetValueExpression(parentClass, method, setterValue, setterVarName);
             if (setterValueExpr != null)
             {

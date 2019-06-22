@@ -41,7 +41,6 @@ namespace EmptyKeys.UserInterface.Designer
             obj.SetValue(DataTypeProperty, value);
         }
 
-
         /// <summary>
         /// The mode property
         /// </summary>
@@ -67,6 +66,33 @@ namespace EmptyKeys.UserInterface.Designer
         public static void SetMode(DependencyObject obj, GeneratedBindingsMode value)
         {
             obj.SetValue(ModeProperty, value);
-        }        
+        }
+
+        /// <summary>
+        /// The data type string property (assembly;full typename)
+        /// </summary>
+        public static readonly DependencyProperty DataTypeStringProperty =
+            DependencyProperty.RegisterAttached("DataTypeString", typeof(string), typeOfThis,
+            new FrameworkPropertyMetadata(null, FrameworkPropertyMetadataOptions.None));
+
+        /// <summary>
+        /// Gets the type (string) of the data.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <returns></returns>
+        public static string GetDataTypeString(DependencyObject obj)
+        {
+            return (string)obj.GetValue(DataTypeProperty);
+        }
+
+        /// <summary>
+        /// Sets the type (string) of the data.
+        /// </summary>
+        /// <param name="obj">The object.</param>
+        /// <param name="value">The value.</param>
+        public static void SetDataTypeString(DependencyObject obj, string value)
+        {
+            obj.SetValue(DataTypeProperty, value);
+        }
     }
 }

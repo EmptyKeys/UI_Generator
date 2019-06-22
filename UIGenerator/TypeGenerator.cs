@@ -1,18 +1,16 @@
-﻿using System;
-using System.CodeDom;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using System.Windows;
-using System.Windows.Controls;
-using EmptyKeys.UserInterface.Designer;
+﻿using EmptyKeys.UserInterface.Designer;
 using EmptyKeys.UserInterface.Generator.Types;
 using EmptyKeys.UserInterface.Generator.Types.Charts;
 using EmptyKeys.UserInterface.Generator.Types.Controls;
 using EmptyKeys.UserInterface.Generator.Types.Controls.Primitives;
 using EmptyKeys.UserInterface.Generator.Types.Shapes;
+using System;
+using System.CodeDom;
+using System.Collections;
+using System.Collections.Generic;
+using System.Reflection;
+using System.Windows;
+using System.Windows.Controls;
 
 namespace EmptyKeys.UserInterface.Generator
 {
@@ -279,6 +277,17 @@ namespace EmptyKeys.UserInterface.Generator
                         BindingGenerator.Instance.ActiveDataType = newType;
                     }
 
+                    string newTypeString = xamlSource.GetValue(GeneratedBindings.DataTypeStringProperty) as string;
+                    if (!string.IsNullOrEmpty(newTypeString))
+                    {
+                        string[] split = newTypeString.Split(';');
+                        if (split.Length == 2)
+                        {
+                            var typeAssembly = Assembly.LoadFrom(split[0] + ".dll");
+                            BindingGenerator.Instance.ActiveDataType = typeAssembly.GetType(split[1]);
+                        }
+                    }
+
                     FrameworkElement elem = source as FrameworkElement;
                     if (elem != null)
                     {
@@ -294,10 +303,10 @@ namespace EmptyKeys.UserInterface.Generator
                             resourcesMethod.Name = "InitializeElement" + elem.Name + "Resources";
                             resourcesMethod.Parameters.Add(new CodeParameterDeclarationExpression("UIElement", "elem"));
                             classType.Members.Add(resourcesMethod);
-                            resourcesGenerator.Generate(elem.Resources, classType, resourcesMethod, 
-                                new CodeFieldReferenceExpression(new CodeVariableReferenceExpression("elem"), "Resources"));
+                            resourcesGenerator.Generate(elem.Resources, classType, resourcesMethod,
+                                new CodeFieldReferenceExpression(new CodeVariableReferenceExpression("elem"), "Resources"), elem.Name);
 
-                            method.Statements.Add(new CodeMethodInvokeExpression(null,resourcesMethod.Name, parent));
+                            method.Statements.Add(new CodeMethodInvokeExpression(null, resourcesMethod.Name, parent));
                         }
                     }
 
@@ -326,7 +335,7 @@ namespace EmptyKeys.UserInterface.Generator
                 }
             }
 
-            string errorText = "Unknown type : " + source.GetType(); 
+            string errorText = "Unknown type : " + source.GetType();
             Console.WriteLine(errorText);
             CodeSnippetStatement error = new CodeSnippetStatement("#error " + errorText);
             method.Statements.Add(error);
