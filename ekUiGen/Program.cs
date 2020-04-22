@@ -16,12 +16,13 @@ namespace ekUiGen
         [STAThread]
         static int Main(string[] args)
         {
-            Console.WriteLine("Empty Keys (c) 2016 User Interface Generator Console v" + Assembly.GetExecutingAssembly().GetName().Version.ToString());
+            Console.WriteLine("Empty Keys (c) 2019 User Interface Generator Console v" + Assembly.GetExecutingAssembly().GetName().Version.ToString());
 
             bool showHelp = false;
             bool ignoreImageAssets = false;
             bool ignoreFontAssets = false;
             bool generateBindings = false;
+            bool imagesWithExt = false;
             string inputDirectory = string.Empty;
             string outputDirectory = string.Empty;
             string assetOutputDirectory = string.Empty;
@@ -48,7 +49,8 @@ namespace ekUiGen
                 .Add<string>("bd|buildDir=", "Directory for additional assemblies", o => buildDir = o)
                 .Add("generate-bindings", "Generate data bindings", o => generateBindings = o != null)
                 .Add<string>("da|defaultAssembly=", "Assembly name to use for clr-namespaces without an assembly", o => defaultAssembly = o)
-                .Add<string>("header=", "Header file for generated .cs files", o => headerFile = o);
+                .Add<string>("header=", "Header file for generated .cs files", o => headerFile = o)
+                .Add("images_with_extensions", "Generate images assets with extensions.", o => imagesWithExt = o != null);
 
             try
             {
@@ -135,6 +137,7 @@ namespace ekUiGen
                 header = File.ReadAllText(headerFile);
             }
 
+            ImageAssets.Instance.GenerateWithExtensions = imagesWithExt;
             BindingGenerator.Instance.IsEnabled = generateBindings;
 
             foreach (var file in Directory.EnumerateFiles(inputDirectory, "*.xaml", SearchOption.AllDirectories))

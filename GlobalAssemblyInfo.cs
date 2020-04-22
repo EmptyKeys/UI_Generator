@@ -8,10 +8,10 @@ using System.Resources;
 #endif
 
 [assembly: AssemblyCompany("Empty Keys")]
-[assembly: AssemblyCopyright("Copyright © 2016 Empty Keys, Filip Dušek")]
+[assembly: AssemblyCopyright("Copyright © 2019 Empty Keys, Filip Dušek")]
 [assembly: AssemblyTrademark("Empty Keys ™")]
 
 [assembly: NeutralResourcesLanguage("en")]
 
-[assembly: AssemblyVersion("3.0.0.0")]
-[assembly: AssemblyFileVersion("3.0.0.0")]
+[assembly: AssemblyVersion("3.2.0.0")]
+[assembly: AssemblyFileVersion("3.2.0.0")]

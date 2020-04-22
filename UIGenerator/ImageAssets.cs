@@ -2,10 +2,7 @@
 using System.CodeDom;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace EmptyKeys.UserInterface.Generator
 {
@@ -30,6 +27,11 @@ namespace EmptyKeys.UserInterface.Generator
             }
         }
 
+        /// <summary>
+        /// Gets/Sets generate with extensions
+        /// </summary>
+        public bool GenerateWithExtensions { get; set; }
+
         private List<string> imageAssets = new List<string>();
         private List<string> files = new List<string>();
 
@@ -43,11 +45,16 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="assetName">Name of the asset.</param>
         /// <param name="extension">The extension.</param>
         public void AddImage(string assetName, string extension)
-        {
+        {            
             if (!imageAssets.Contains(assetName))
             {
                 imageAssets.Add(assetName);
                 string assetFile = assetName + extension;
+                if (GenerateWithExtensions)
+                {
+                    assetFile = assetName;
+                }
+
                 if (!files.Contains(assetFile))
                 {
                     files.Add(assetFile);
@@ -62,7 +69,7 @@ namespace EmptyKeys.UserInterface.Generator
         public void GenerateManagerCode(CodeMemberMethod method)
         {
             foreach (var asset in imageAssets)
-            {                
+            {
                 method.Statements.Add(new CodeMethodInvokeExpression(
                     new CodeFieldReferenceExpression(
                         new CodeTypeReferenceExpression("ImageManager"), "Instance"),

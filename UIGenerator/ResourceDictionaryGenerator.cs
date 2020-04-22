@@ -25,7 +25,9 @@ namespace EmptyKeys.UserInterface.Generator
         /// <param name="classType">Type of the class.</param>
         /// <param name="initMethod">The initialize method.</param>
         /// <param name="fieldReference">The field reference.</param>
-        public void Generate(ResourceDictionary dictionary, CodeTypeDeclaration classType, CodeMemberMethod initMethod, CodeExpression fieldReference)
+        /// <param name="elemName">The element name.</param>
+        public void Generate(ResourceDictionary dictionary, 
+            CodeTypeDeclaration classType, CodeMemberMethod initMethod, CodeExpression fieldReference, string elemName)
         {
             foreach (var mergedDict in dictionary.MergedDictionaries)
             {
@@ -51,7 +53,7 @@ namespace EmptyKeys.UserInterface.Generator
             }
 
             ValueGenerator valueGenerator = new ValueGenerator();
-            List<object> keys = dictionary.Keys.Cast<object>().OrderBy(k => k.ToString()).ToList();
+            List<object> keys = dictionary.Keys.Cast<object>().OrderBy(k => k.ToString(), StringComparer.InvariantCulture).ToList();
             foreach (var resourceKey in keys)
             {
                 object resourceValue = dictionary[resourceKey];
@@ -60,7 +62,7 @@ namespace EmptyKeys.UserInterface.Generator
                 initMethod.Statements.Add(new CodeCommentStatement(comment));
 
                 CodeExpression keyExpression = CodeComHelper.GetResourceKeyExpression(resourceKey);
-                CodeExpression valueExpression = valueGenerator.ProcessGenerators(classType, initMethod, resourceValue, "r_" + uniqueId, dictionary);
+                CodeExpression valueExpression = valueGenerator.ProcessGenerators(classType, initMethod, resourceValue, elemName + "r_" + uniqueId, dictionary);
 
                 if (valueExpression != null)
                 {
