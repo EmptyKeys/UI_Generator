@@ -223,6 +223,9 @@ namespace EmptyKeys.UserInterface.Generator
 
             IGeneratorType uniGrid = new UniformGridGeneratorType();
             Generators.Add(uniGrid.XamlType, uniGrid);
+
+            IGeneratorType radialPanel = new RadialPanelGeneratorType();
+            Generators.Add(radialPanel.XamlType, radialPanel);
         }
 
         /// <summary>

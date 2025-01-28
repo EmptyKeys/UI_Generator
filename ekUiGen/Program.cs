@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.IO;
 using System.Linq;
 using System.Reflection;
@@ -121,8 +122,14 @@ namespace ekUiGen
 
             if (!string.IsNullOrEmpty(buildDir))
             {
-                Console.WriteLine("Copy of additional assemblies...");                
-                CopyDirectory(buildDir, Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location), true);
+                Console.WriteLine("Loading of additional assemblies...");
+                //var targetDir = Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
+                //CopyDirectory(buildDir, targetDir, true);
+
+                foreach (var dll in Directory.EnumerateFiles(buildDir, "*.dll", SearchOption.AllDirectories))
+                {
+                   var assembly = Assembly.LoadFrom(dll);
+                }
             }
 
             string header = string.Empty;
@@ -211,7 +218,7 @@ namespace ekUiGen
             UserInterfaceGenerator generator = new UserInterfaceGenerator();
             string generatedCode = string.Empty;
             try
-            {
+            {                                
                 generatedCode = generator.GenerateCode(xamlFile, xaml, renderMode, desiredNamespace, header);
             }
             catch (Exception ex)

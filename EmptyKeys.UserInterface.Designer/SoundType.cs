@@ -6,51 +6,64 @@ using System.Threading.Tasks;
 
 namespace EmptyKeys.UserInterface.Designer
 {
+    /// <summary>
+    /// Sound Types for UI
+    /// </summary>
     public enum SoundType
     {
         /// <summary>
-        /// The none
+        /// 
         /// </summary>
         None,
 
         /// <summary>
-        /// The buttons click sound
+        /// The buttons click
         /// </summary>
         ButtonsClick,
 
         /// <summary>
-        /// The buttons hover
+        /// The buttons hover sound
         /// </summary>
         ButtonsHover,
 
         /// <summary>
-        /// The ListBox move sound
+        /// The ListBox move
         /// </summary>
         ListBoxMove,
 
         /// <summary>
-        /// The ListBox select sound
+        /// The ListBox select
         /// </summary>
         ListBoxSelect,
 
         /// <summary>
-        /// The text box key press sound
+        /// The text box key press
         /// </summary>
         TextBoxKeyPress,
 
         /// <summary>
-        /// The tab control move sound
+        /// The tab control move
         /// </summary>
         TabControlMove,
 
         /// <summary>
-        /// The tab control select sound
+        /// The tab control select
         /// </summary>
         TabControlSelect,
 
         /// <summary>
         /// The CheckBox hover
         /// </summary>
-        CheckBoxHover
+        CheckBoxHover,
+
+        /// <summary>
+        /// The RadioButton hover
+        /// </summary>
+        RadioButtonHover,
+
+        /// <summary>
+        /// Sound type when focus is changed
+        /// </summary>
+        FocusChanged
     }
 }

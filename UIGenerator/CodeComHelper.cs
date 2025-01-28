@@ -76,6 +76,10 @@ namespace EmptyKeys.UserInterface.Generator
             supportedAttachedProperties.Add("VirtualizedCacheMaxItems");
             supportedAttachedProperties.Add("EnableVirtualization");
             supportedAttachedProperties.Add("ColorOverlay");
+            supportedAttachedProperties.Add("TabIndexLeft");
+            supportedAttachedProperties.Add("TabIndexRight");
+            supportedAttachedProperties.Add("TabIndexUp");
+            supportedAttachedProperties.Add("TabIndexDown");
 
             ignoredProperties.Add("NameScope");
             ignoredProperties.Add("BaseUri");
